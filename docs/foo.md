@@ -1,3 +1,8 @@
+---
+layout: page
+title: Reverse proxy
+---
+
 Reverse Proxy
 =============
 

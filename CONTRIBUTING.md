@@ -37,7 +37,7 @@ the existing tests to see the testing approach and style used.
 
 If you use ReSharper or Rider, you can load the code style settings from
 the repository, stored in
-[device-simulation.sln.DotSettings](device-simulation.sln.DotSettings)
+[reverse-proxy.sln.DotSettings](reverse-proxy.sln.DotSettings)
 
 Some quick notes about the project code style:
 
