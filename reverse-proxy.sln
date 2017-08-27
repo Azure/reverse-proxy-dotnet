@@ -1,0 +1,68 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26430.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProxyAgent", "ProxyAgent\ProxyAgent.csproj", "{502EBAFE-91F7-4E0D-9905-A0E4B4BBA3FF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProxyAgent.Test", "ProxyAgent.Test\ProxyAgent.Test.csproj", "{01A9627B-486B-4641-82B0-909CBDD63EB2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "solution", "solution", "{A7874FC8-DB34-4EB0-9EDC-7818B3DF289D}"
+ProjectSection(SolutionItems) = preProject
+	.gitignore = .gitignore
+	.gitattributes = .gitattributes
+	CONTRIBUTING.md = CONTRIBUTING.md
+	LICENSE = LICENSE
+	README.md = README.md
+	reverse-proxy.sln.DotSettings = reverse-proxy.sln.DotSettings
+EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{B2E55E7C-7EDF-429A-BF44-69BD28CDA4E7}"
+ProjectSection(SolutionItems) = preProject
+	scripts\.functions.sh = scripts\.functions.sh
+	scripts\clean-up = scripts\clean-up
+	scripts\clean-up.cmd = scripts\clean-up.cmd
+	scripts\run = scripts\run
+	scripts\run.cmd = scripts\run.cmd
+	scripts\build = scripts\build
+	scripts\build.cmd = scripts\build.cmd
+EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "git", "git", "{B052137F-1F0D-4F87-B4F7-66F7B8E41D7E}"
+ProjectSection(SolutionItems) = preProject
+	scripts\git\fix-perms.sh = scripts\git\fix-perms.sh
+	scripts\git\pre-commit-runner-no-sandbox.sh = scripts\git\pre-commit-runner-no-sandbox.sh
+	scripts\git\pre-commit.sh = scripts\git\pre-commit.sh
+	scripts\git\setup = scripts\git\setup
+	scripts\git\setup.cmd = scripts\git\setup.cmd
+EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{CE9EA71C-C6AA-41A5-821C-F18CB599A818}"
+ProjectSection(SolutionItems) = preProject
+	docs\INDEX.md = docs\INDEX.md
+EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{502EBAFE-91F7-4E0D-9905-A0E4B4BBA3FF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{502EBAFE-91F7-4E0D-9905-A0E4B4BBA3FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{502EBAFE-91F7-4E0D-9905-A0E4B4BBA3FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{502EBAFE-91F7-4E0D-9905-A0E4B4BBA3FF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{01A9627B-486B-4641-82B0-909CBDD63EB2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{01A9627B-486B-4641-82B0-909CBDD63EB2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{01A9627B-486B-4641-82B0-909CBDD63EB2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{01A9627B-486B-4641-82B0-909CBDD63EB2}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{B2E55E7C-7EDF-429A-BF44-69BD28CDA4E7} = {A7874FC8-DB34-4EB0-9EDC-7818B3DF289D}
+		{B052137F-1F0D-4F87-B4F7-66F7B8E41D7E} = {B2E55E7C-7EDF-429A-BF44-69BD28CDA4E7}
+		{CE9EA71C-C6AA-41A5-821C-F18CB599A818} = {A7874FC8-DB34-4EB0-9EDC-7818B3DF289D}
+	EndGlobalSection
+EndGlobal
