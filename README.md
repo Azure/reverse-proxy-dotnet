@@ -1,3 +1,7 @@
+[![Build][build-badge]][build-url]
+[![Issues][issues-badge]][issues-url]
+[![Gitter][gitter-badge]][gitter-url]
+
 Reverse Proxy
 =============
 
@@ -37,3 +41,12 @@ However, you can easily extend the code to use a custom certificate,
 see the
 [documentation](https://azure.github.io/reverse-proxy-dotnet/ssl-setup.html)
 for more information.
+
+
+
+[build-badge]: https://img.shields.io/travis/Azure/reverse-proxy-dotnet.svg
+[build-url]: https://travis-ci.org/Azure/reverse-proxy-dotnet
+[issues-badge]: https://img.shields.io/github/issues/azure/reverse-proxy-dotnet.svg
+[issues-url]: https://github.com/azure/reverse-proxy-dotnet/issues
+[gitter-badge]: https://img.shields.io/gitter/room/azure/iot-pcs.js.svg
+[gitter-url]: https://gitter.im/azure/iot-pcs
