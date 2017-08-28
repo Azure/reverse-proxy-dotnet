@@ -14,6 +14,6 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.Runtime
         public static TimeSpan Duration => DateTimeOffset.UtcNow.Subtract(Start);
 
         /// <summary>A randomly generated ID used to identify the process in the logs</summary>
-        public static string ProcessId { get; } = "WebApplication." + Guid.NewGuid();
+        public static string ProcessId { get; } = "ProxyAgent." + Guid.NewGuid();
     }
 }
