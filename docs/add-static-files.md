@@ -15,12 +15,14 @@ folder already contains some examples:
 * [robots.txt](ProxyAgent/wwwroot/robots.txt)
 * [favicon.ico](ProxyAgent/wwwroot/favicon.ico)
 
+When requesting `/` the service will try to locate and serve one of
+`default.htm`, `default.html`, `index.htm` or `index.html`.
 
 Adding a full web site to the reverse proxy
 -------------------------------------------
 
 The following instructions show how to add a full static web site to the
-reverse proxy. 
+reverse proxy.
 
 As an example target, we will use Azure IoT Remote Monitoring web user
 interface, a Node.js application that needs to be compiled in order
@@ -33,14 +35,23 @@ web site.
    cd examples/pcs-remote-monitoring-webui
    git pull
    ```
-2. Build the Node.js code to get an optimized production build:
+2. Remove the hardcoded hostname:
+   ```
+   echo "REACT_APP_BASE_SERVICE_URL=" > .env
+   ```
+3. Build the Node.js code to get an optimized production build:
    ```
    npm install
    npm run build
    ```
-3. Copy the optimized site files into wwwroot:
+4. Copy the optimized site files into wwwroot:
    ```
    cd build
+   rm -fR ../../../ProxyAgent/wwwroot/*
    mv * ../../../ProxyAgent/wwwroot/
    ```
-   
+5. To test the web site, from the solution root run:
+   ```
+   scripts/run
+   ```
+   then point your browser to URL shown (e.g. http://localhost:9000)
