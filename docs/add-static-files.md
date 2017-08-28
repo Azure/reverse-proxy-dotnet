@@ -17,7 +17,7 @@ folder already contains some examples:
 
 
 Adding a full web site to the reverse proxy
-===========================================
+-------------------------------------------
 
 The following instructions show how to add a full static web site to the
 reverse proxy. 
