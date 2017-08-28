@@ -75,7 +75,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.HttpClient
         public bool IsServerError => (int) this.StatusCode >= 500;
         public bool IsServiceUnavailable => (int) this.StatusCode == 503;
 
-        // HTTP status code without a body - see RFC 2616
+        // HTTP status codes without a body - see RFC 2616
         public bool CanHaveBody
         {
             get
