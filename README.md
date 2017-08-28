@@ -28,10 +28,12 @@ The [scripts](scripts) folder contains scripts for some frequent tasks:
 
 ## Deployment
 
-The service is designed to be deployed as an Azure Web App, reusing the
-SSL encryption provided by the platform, to expose, for example, private
-services hosted in Azure VMs, Cloud Apps, etc.
+The service is designed to be deployed as an 
+[Azure Web App](https://docs.microsoft.com/en-us/azure/app-service-web/app-service-web-tutorial-custom-SSL),
+reusing the SSL encryption provided by the platform, to expose, for example,
+private services hosted in Azure VMs, Cloud Apps, etc.
 
 However, you can easily extend the code to use a custom certificate,
-see the [documentation](https://azure.github.io/reverse-proxy-dotnet)
+see the
+[documentation](https://azure.github.io/reverse-proxy-dotnet/ssl-setup.html)
 for more information.
