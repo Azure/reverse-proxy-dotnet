@@ -10,7 +10,7 @@ check_dependency_dotnet
 
 cd $APP_HOME
 
-dotnet restore --verbosity=quiet pcs-reverseproxy.sln
+dotnet restore --verbosity=quiet
 
 cd ProxyAgent
 dotnet run --configuration $CONFIGURATION --project ProxyAgent.csproj

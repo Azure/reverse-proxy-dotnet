@@ -11,17 +11,11 @@
     <StartAction>Project</StartAction>
     <EnvironmentVariables>
       <Variable name="ASPNETCORE_ENVIRONMENT" value="Development" />
-      <Variable name="ASPNETCORE_ENVIRONMENT" value="Development" />
       <Variable name="DYLD_LIBRARY_PATH" value="usr/local/lib/" />
     </EnvironmentVariables>
     <ApplicationURL>http://localhost:9000</ApplicationURL>
     <LaunchUrl>http://localhost:9000/</LaunchUrl>
   </PropertyGroup>
-  <ItemGroup>
-    <Content Include="appsettings.ini">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Autofac" Version="4.6.1" />
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="4.2.0" />
@@ -30,6 +24,11 @@
     <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="1.1.2" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Ini" Version="1.1.2" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="1.1.2" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="appsettings.ini">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ProjectExtensions>
     <MonoDevelop>

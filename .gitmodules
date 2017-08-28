@@ -1,0 +1,3 @@
+[submodule "examples/pcs-remote-monitoring-webui"]
+	path = examples/pcs-remote-monitoring-webui
+	url = git@github.com:Azure/pcs-remote-monitoring-webui.git

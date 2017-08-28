@@ -37,21 +37,11 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
         // Headers returned by the remote endpoint
         // which are not returned to the client
         private static readonly HashSet<string> ExcludedResponseHeaders =
-            new HashSet<string>
-            {
-                "content-length",
-                "server",
-                "connection"
-            };
+            new HashSet<string> { "content-length", "server", "connection" };
 
         // HTTP methods with a payload
         private static readonly HashSet<string> MethodsWithPayload =
-            new HashSet<string>
-            {
-                "POST",
-                "PUT",
-                "PATCH"
-            };
+            new HashSet<string> { "POST", "PUT", "PATCH" };
 
         private readonly IHttpClient client;
         private readonly ILogger log;
@@ -100,13 +90,13 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
                 default:
                     // Note: this could flood the logs due to spiders...
                     this.log.Info("Request method not supported", () => new { method });
-                    responseOut.StatusCode = (int)HttpStatusCode.NotImplemented;
+                    responseOut.StatusCode = (int) HttpStatusCode.NotImplemented;
                     return;
             }
 
             // Forward the HTTP status code
             this.log.Debug("Status code", () => new { response.StatusCode });
-            responseOut.StatusCode = (int)response.StatusCode;
+            responseOut.StatusCode = (int) response.StatusCode;
 
             // Forward the HTTP headers
             foreach (var header in response.Headers)
@@ -124,7 +114,11 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
                 }
             }
 
-            await responseOut.WriteAsync(response.Content);
+            // Some status codes like 204 and 304 don't have a body
+            if (response.CanHaveBody && !string.IsNullOrEmpty(response.Content))
+            {
+                await responseOut.WriteAsync(response.Content);
+            }
         }
 
         // Prepare the request to send to the remote endpoint

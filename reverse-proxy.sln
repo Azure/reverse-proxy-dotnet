@@ -39,7 +39,22 @@ EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{CE9EA71C-C6AA-41A5-821C-F18CB599A818}"
 ProjectSection(SolutionItems) = preProject
-	docs\INDEX.md = docs\INDEX.md
+	docs\index.md = docs\index.md
+	docs\add-static-files.md = docs\add-static-files.md
+	docs\_config.yml = docs\_config.yml
+	docs\ssl-setup.md = docs\ssl-setup.md
+EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_layouts", "_layouts", "{45D1F48D-0C68-40CF-83D5-E215420BA6D4}"
+ProjectSection(SolutionItems) = preProject
+	docs\_layouts\default.html = docs\_layouts\default.html
+EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "assets", "assets", "{A1C922C7-4CD8-4216-B487-34BA5E1055D6}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "css", "css", "{73683480-441E-4F01-8AC2-5FB74F648CF6}"
+ProjectSection(SolutionItems) = preProject
+	docs\assets\css\style.scss = docs\assets\css\style.scss
 EndProjectSection
 EndProject
 Global
@@ -64,5 +79,8 @@ Global
 		{B2E55E7C-7EDF-429A-BF44-69BD28CDA4E7} = {A7874FC8-DB34-4EB0-9EDC-7818B3DF289D}
 		{B052137F-1F0D-4F87-B4F7-66F7B8E41D7E} = {B2E55E7C-7EDF-429A-BF44-69BD28CDA4E7}
 		{CE9EA71C-C6AA-41A5-821C-F18CB599A818} = {A7874FC8-DB34-4EB0-9EDC-7818B3DF289D}
+		{45D1F48D-0C68-40CF-83D5-E215420BA6D4} = {CE9EA71C-C6AA-41A5-821C-F18CB599A818}
+		{A1C922C7-4CD8-4216-B487-34BA5E1055D6} = {CE9EA71C-C6AA-41A5-821C-F18CB599A818}
+		{73683480-441E-4F01-8AC2-5FB74F648CF6} = {A1C922C7-4CD8-4216-B487-34BA5E1055D6}
 	EndGlobalSection
 EndGlobal

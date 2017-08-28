@@ -44,8 +44,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
             builder.RegisterInstance(config).As<IConfig>().SingleInstance();
 
             // Instantiate only one logger
-            // TODO: read log level from configuration
-            var logger = new Logger(Uptime.ProcessId, LogLevel.Debug);
+            var logger = new Logger(Uptime.ProcessId, config.LogLevel);
             builder.RegisterInstance(logger).As<ILogger>().SingleInstance();
 
             // By default the DI container create new objects when injecting

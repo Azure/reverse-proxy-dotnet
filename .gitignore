@@ -10,3 +10,4 @@ obj/
 .bck
 wwwroot/
 *_.sh
+*.userprefs
