@@ -12,8 +12,8 @@ A/B testing, version management, etc.
 The service allows also to host a set of static files, which are served
 from the local copy, without routing requests to the remote endpoint.
 
-The documentation is available
-[here](https://azure.github.io/reverse-proxy-dotnet/).
+The project documentation is available
+[here](https://azure.github.io/reverse-proxy-dotnet).
 
 How to use the service
 ======================
