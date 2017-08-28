@@ -23,6 +23,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.HttpClient
         bool IsConflict { get; }
         bool IsServerError { get; }
         bool IsServiceUnavailable { get; }
+        bool CanHaveBody { get; }
     }
 
     public class HttpResponse : IHttpResponse
@@ -73,5 +74,16 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.HttpClient
         public bool IsConflict => (int) this.StatusCode == 409;
         public bool IsServerError => (int) this.StatusCode >= 500;
         public bool IsServiceUnavailable => (int) this.StatusCode == 503;
+
+        // HTTP status code without a body - see RFC 2616
+        public bool CanHaveBody
+        {
+            get
+            {
+                var c = (int) this.StatusCode;
+                return c != 304 && c != 204 && c != 205;
+            }
+        }
+
     }
 }
