@@ -30,7 +30,7 @@ for more information about this setup and other options.
 Site content
 ============
 
-* [Project overview](/)
+* [Project overview](index.md)
 * [How to add static files](add-static-files.md)
 * [SSL setup](ssl-setup.md)
 * [Contributing to the project](https://github.com/Azure/reverse-proxy-dotnet/blob/master/CONTRIBUTING.md)
