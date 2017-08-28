@@ -26,32 +26,34 @@ reverse proxy.
 
 As an example target, we will use Azure IoT Remote Monitoring web user
 interface, a Node.js application that needs to be compiled in order
-to generate the static files optimized for the web. For convenience,
-the [examples](examples) folder contains a git submodule pointing to the
-web site.
+to generate the static files optimized for the web.
 
-1. Clone/Update the target project in a temporary folder:
+1. Clone the target project in a temporary folder:
    ```
-   cd examples/pcs-remote-monitoring-webui
-   git pull
+   mkdir temp
+   cd temp
+   git clone git@github.com:Azure/pcs-remote-monitoring-webui.git 
    ```
-2. Remove the hardcoded hostname:
+2. Remove the hardcoded hostname: (TODO: remove this step)
    ```
+   cd pcs-remote-monitoring-webui
    echo "REACT_APP_BASE_SERVICE_URL=" > .env
    ```
 3. Build the Node.js code to get an optimized production build:
    ```
+   cd pcs-remote-monitoring-webui
    npm install
    npm run build
    ```
-4. Copy the optimized site files into wwwroot:
+4. Copy the optimized site files into `wwwroot`:
    ```
    cd build
-   rm -fR ../../../ProxyAgent/wwwroot/*
-   mv * ../../../ProxyAgent/wwwroot/
+   rm -fR {REVERSE PROXY FOLDER}/ProxyAgent/wwwroot/*
+   mv * {REVERSE PROXY FOLDER}/ProxyAgent/wwwroot/
    ```
-5. To test the web site, from the solution root run:
+5. To test the web site:
    ```
+   cd {REVERSE PROXY FOLDER}
    scripts/run
    ```
    then point your browser to URL shown (e.g. http://localhost:9000)
