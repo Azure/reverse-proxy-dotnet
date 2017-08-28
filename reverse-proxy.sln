@@ -39,7 +39,8 @@ EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{CE9EA71C-C6AA-41A5-821C-F18CB599A818}"
 ProjectSection(SolutionItems) = preProject
-	docs\INDEX.md = docs\INDEX.md
+	docs\index.md = docs\index.md
+	docs\add-static-files.md = docs\add-static-files.md
 EndProjectSection
 EndProject
 Global
