@@ -1,16 +1,16 @@
-Service pages via HTTPS, SSL setup
+Serving pages via HTTPS, SSL setup
 ==================================
 
-The service is designed to be deployed as an Azure Web App, reusing the
-SSL encryption provided by the platform, to expose, for example, private
-services hosted in Azure VMs, Cloud Apps, etc.
+The service is designed to be deployed as an 
+[Azure Web App](https://docs.microsoft.com/en-us/azure/app-service-web/app-service-web-tutorial-custom-SSL),
+reusing the SSL encryption provided by the platform, to expose, for example,
+private services hosted in Azure VMs, Cloud Apps, etc.
 
-However, you can easily extend the code to use a custom certificate,
-editing
+However, you can easily extend the code to use a custom certificate, editing
 [Program.cs](https://github.com/Azure/reverse-proxy-dotnet/blob/master/ProxyAgent/Program.cs)
-and using something like this:
+and using something like:
 
-```
+```c#
 var host = new WebHostBuilder()
     .UseKestrel(options =>
     {
