@@ -42,6 +42,7 @@ ProjectSection(SolutionItems) = preProject
 	docs\index.md = docs\index.md
 	docs\add-static-files.md = docs\add-static-files.md
 	docs\_config.yml = docs\_config.yml
+	docs\ssl-setup.md = docs\ssl-setup.md
 EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_layouts", "_layouts", "{45D1F48D-0C68-40CF-83D5-E215420BA6D4}"
