@@ -14,7 +14,8 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.Runtime
     {
         LogLevel LogLevel { get; }
         int Port { get; }
-        string Hostname { get; }
+        string Endpoint { get; }
+        int MaxPayloadSize { get; }
     }
 
     /// <summary>Web application configuration</summary>
@@ -23,11 +24,13 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.Runtime
         private const string ApplicationKey = "reverseproxy:";
         private const string LogLevelKey = ApplicationKey + "loglevel";
         private const string PortKey = ApplicationKey + "port";
-        private const string HostnameKey = ApplicationKey + "hostname";
+        private const string EndpointKey = ApplicationKey + "endpoint";
+        private const string MaxPayloadSizeKey = ApplicationKey + "maxPayloadSize";
 
         public LogLevel LogLevel { get; }
         public int Port { get; }
-        public string Hostname { get; }
+        public string Endpoint { get; }
+        public int MaxPayloadSize { get; }
 
         public Config(IConfigData configData)
         {
@@ -35,9 +38,10 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.Runtime
             this.LogLevel = logLevel;
 
             this.Port = configData.GetInt(PortKey);
+            this.MaxPayloadSize = configData.GetInt(MaxPayloadSizeKey);
 
-            this.Hostname = configData.GetString(HostnameKey);
-            if (string.IsNullOrEmpty(this.Hostname))
+            this.Endpoint = configData.GetString(EndpointKey);
+            if (string.IsNullOrEmpty(this.Endpoint))
             {
                 throw new InvalidConfigurationException("The remote hostname is empty.");
             }

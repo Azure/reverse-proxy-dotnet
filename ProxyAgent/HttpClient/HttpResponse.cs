@@ -84,6 +84,5 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.HttpClient
                 return c != 304 && c != 204 && c != 205;
             }
         }
-
     }
 }

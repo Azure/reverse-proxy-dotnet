@@ -33,12 +33,6 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
         // Configure method below.
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
-            // Add CORS service
-            services.AddCors();
-
-            // Add controllers as services so they'll be resolved.
-            services.AddMvc().AddControllersAsServices();
-
             this.ApplicationContainer = DependencyResolution.Setup(services);
 
             // Print some useful information at bootstrap time
@@ -57,8 +51,11 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
         {
             loggerFactory.AddConsole(this.Configuration.GetSection("Logging"));
 
-            app.UseDefaultFiles();
-            app.UseStaticFiles();
+            // Uncomment these lines if you want to host static files in wwwroot/
+            // More info: https://docs.microsoft.com/en-us/aspnet/core/fundamentals/middleware
+            // app.UseDefaultFiles();
+            // app.UseStaticFiles();
+
             app.UseMiddleware<ProxyMiddleware>();
 
             // If you want to dispose of resources that have been resolved in the
@@ -71,7 +68,9 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
             var logger = container.Resolve<ILogger>();
             var config = container.Resolve<IConfig>();
             logger.Info("Proxy agent started", () => new { Uptime.ProcessId });
-            logger.Info("Remote hostname: " + config.Hostname, () => { });
+            logger.Info("TCP port: " + config.Port, () => { });
+            logger.Info("Remote endpoint: " + config.Endpoint, () => { });
+            logger.Info("Max payload size: " + config.MaxPayloadSize, () => { });
         }
     }
 }

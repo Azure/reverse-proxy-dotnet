@@ -23,7 +23,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
         {
             this.proxy = proxy;
             this.log = log;
-            this.hostname = config.Hostname;
+            this.hostname = config.Endpoint;
         }
 
         public async Task Invoke(HttpContext context)
