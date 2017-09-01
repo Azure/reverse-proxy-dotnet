@@ -31,22 +31,33 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
                 "connection",
                 "content-length",
                 "keep-alive",
-                "upgrade",
                 "host",
+                "upgrade",
                 "upgrade-insecure-requests"
             };
 
         // Headers returned by the remote endpoint
         // which are not returned to the client
-        private static readonly HashSet<string> ExcludedResponseHeaders =
-            new HashSet<string> { "content-length", "server", "connection" };
 
         // HTTP methods with a payload
+
+        private static readonly HashSet<string> ExcludedResponseHeaders =
+            new HashSet<string>
+            {
+                "connection", 
+                "content-length", 
+                "server", 
+                "transfer-encoding",
+                "upgrade",
+            };
+
         private static readonly HashSet<string> MethodsWithPayload =
             new HashSet<string> { "POST", "PUT", "PATCH" };
 
         private readonly IHttpClient client;
+
         private readonly IConfig config;
+
         private readonly ILogger log;
 
         public Proxy(
