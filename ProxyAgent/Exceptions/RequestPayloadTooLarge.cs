@@ -5,9 +5,8 @@ using System;
 namespace Microsoft.Azure.IoTSolutions.ReverseProxy.Exceptions
 {
     /// <summary>
-    /// This exception is thrown when the service is configured incorrectly.
-    /// In order to recover, the service owner should fix the configuration
-    /// and re-deploy the service.
+    /// This exception is thrown when a client sends a request
+    /// too large to handle, depending on the configured settings.
     /// </summary>
     public class RequestPayloadTooLargeException : Exception
     {
