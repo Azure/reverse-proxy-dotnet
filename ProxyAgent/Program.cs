@@ -10,16 +10,16 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
     {
         public static void Main(string[] args)
         {
-            var config = new Config(new ConfigData());
+            //var config = new Config(new ConfigData());
 
             var host = new WebHostBuilder()
                 .UseKestrel(options =>
                 {
                     options.AddServerHeader = false;
                     // The default setting is ProcessorCount/2
-                    options.ThreadCount = System.Environment.ProcessorCount;
+                    //options.ThreadCount = System.Environment.ProcessorCount;
                 })
-                .UseUrls("http://*:" + config.Port)
+                //.UseUrls("http://*:" + config.Port)
                 .UseContentRoot(Directory.GetCurrentDirectory())
                 .UseIISIntegration()
                 .UseStartup<Startup>()

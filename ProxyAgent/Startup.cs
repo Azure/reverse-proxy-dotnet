@@ -33,6 +33,8 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
         // Configure method below.
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
+            services.AddMvc();
+
             this.ApplicationContainer = DependencyResolution.Setup(services);
 
             // Print some useful information at bootstrap time
@@ -55,6 +57,8 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
             // More info: https://docs.microsoft.com/en-us/aspnet/core/fundamentals/middleware
             // app.UseDefaultFiles();
             // app.UseStaticFiles();
+
+            app.UseMvc();
 
             app.UseMiddleware<ProxyMiddleware>();
 
