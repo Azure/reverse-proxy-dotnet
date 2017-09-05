@@ -6,7 +6,6 @@ using Microsoft.Azure.IoTSolutions.ReverseProxy.Runtime;
 
 namespace Microsoft.Azure.IoTSolutions.ReverseProxy.Controllers
 {
-    // TODO: require auth
     [Route("[controller]")]
     public class StatusController : Controller
     {
@@ -17,14 +16,25 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.Controllers
             this.config = config;
         }
 
-        // GET api/values
         [HttpGet]
         public Dictionary<string, string> Get()
         {
+            if (this.config.ConfigStatus)
+            {
+                return new Dictionary<string, string>
+                {
+                    { "Status", "Alive and Well" },
+                    { "Endpoint", this.config.Endpoint },
+                    { "MaxPayloadSize", this.config.MaxPayloadSize.ToString() },
+                    { "ProcessId", Uptime.ProcessId },
+                    { "Uptime.Start", Uptime.Start.ToString() },
+                    { "Uptime.Duration", Uptime.Duration.ToString(@"dd\.hh\:mm\:ss") }
+                };
+            }
+
             return new Dictionary<string, string>
             {
-                { "Endpoint", this.config.Endpoint },
-                { "MaxPayloadSize", this.config.MaxPayloadSize.ToString() }
+                { "Status", "Alive and Well" }
             };
         }
     }
