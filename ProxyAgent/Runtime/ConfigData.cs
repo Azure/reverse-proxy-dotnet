@@ -14,6 +14,8 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.Runtime
     {
         string GetString(string key);
         int GetInt(string key);
+
+        bool GetBool(string key);
     }
 
     public class ConfigData : IConfigData
@@ -34,6 +36,16 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.Runtime
         {
             var value = this.configuration.GetValue<string>(key);
             return ReplaceEnvironmentVariables(value);
+        }
+
+        public bool GetBool(string key)
+        {
+            var value = this.configuration.GetValue<string>(key).ToLowerInvariant();
+            return value == "true"
+                   || value == "t"
+                   || value == "yes"
+                   || value == "y"
+                   || value == "1";
         }
 
         public int GetInt(string key)

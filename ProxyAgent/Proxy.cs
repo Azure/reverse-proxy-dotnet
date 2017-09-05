@@ -6,7 +6,9 @@ using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.IoTSolutions.ReverseProxy.Diagnostics;
+using Microsoft.Azure.IoTSolutions.ReverseProxy.Exceptions;
 using Microsoft.Azure.IoTSolutions.ReverseProxy.HttpClient;
+using Microsoft.Azure.IoTSolutions.ReverseProxy.Runtime;
 using HttpRequest = Microsoft.AspNetCore.Http.HttpRequest;
 using HttpResponse = Microsoft.AspNetCore.Http.HttpResponse;
 
@@ -29,28 +31,42 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
                 "connection",
                 "content-length",
                 "keep-alive",
-                "upgrade",
                 "host",
+                "upgrade",
                 "upgrade-insecure-requests"
             };
 
         // Headers returned by the remote endpoint
         // which are not returned to the client
-        private static readonly HashSet<string> ExcludedResponseHeaders =
-            new HashSet<string> { "content-length", "server", "connection" };
 
         // HTTP methods with a payload
+
+        private static readonly HashSet<string> ExcludedResponseHeaders =
+            new HashSet<string>
+            {
+                "connection", 
+                "content-length", 
+                "server", 
+                "transfer-encoding",
+                "upgrade",
+            };
+
         private static readonly HashSet<string> MethodsWithPayload =
             new HashSet<string> { "POST", "PUT", "PATCH" };
 
         private readonly IHttpClient client;
+
+        private readonly IConfig config;
+
         private readonly ILogger log;
 
         public Proxy(
             IHttpClient httpclient,
+            IConfig config,
             ILogger log)
         {
             this.client = httpclient;
+            this.config = config;
             this.log = log;
         }
 
@@ -59,7 +75,17 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
             HttpRequest requestIn,
             HttpResponse responseOut)
         {
-            var request = this.BuildRequest(requestIn, hostname);
+            IHttpRequest request;
+
+            try
+            {
+                request = this.BuildRequest(requestIn, hostname);
+            }
+            catch (RequestPayloadTooLargeException)
+            {
+                responseOut.StatusCode = (int) HttpStatusCode.RequestEntityTooLarge;
+                return;
+            }
 
             IHttpResponse response;
             var method = requestIn.Method.ToUpperInvariant();
@@ -94,31 +120,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
                     return;
             }
 
-            // Forward the HTTP status code
-            this.log.Debug("Status code", () => new { response.StatusCode });
-            responseOut.StatusCode = (int) response.StatusCode;
-
-            // Forward the HTTP headers
-            foreach (var header in response.Headers)
-            {
-                if (ExcludedResponseHeaders.Contains(header.Key.ToLowerInvariant()))
-                {
-                    this.log.Debug("Ignoring response header", () => new { header.Key, header.Value });
-                    continue;
-                }
-
-                this.log.Debug("Adding response header", () => new { header.Key, header.Value });
-                foreach (var value in header.Value)
-                {
-                    responseOut.Headers.Add(header.Key, value);
-                }
-            }
-
-            // Some status codes like 204 and 304 don't have a body
-            if (response.CanHaveBody && !string.IsNullOrEmpty(response.Content))
-            {
-                await responseOut.WriteAsync(response.Content);
-            }
+            await this.BuildResponseAsync(response, responseOut);
         }
 
         // Prepare the request to send to the remote endpoint
@@ -150,7 +152,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
             var method = requestIn.Method.ToUpperInvariant();
             if (MethodsWithPayload.Contains(method))
             {
-                requestOut.SetContent(GetRequestPayload(requestIn));
+                requestOut.SetContent(this.GetRequestPayload(requestIn));
             }
 
             // Allow error codes without throwing an exception
@@ -162,7 +164,36 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
             return requestOut;
         }
 
-        private static string GetRequestPayload(HttpRequest request)
+        private async Task BuildResponseAsync(IHttpResponse response, HttpResponse responseOut)
+        {
+            // Forward the HTTP status code
+            this.log.Debug("Status code", () => new { response.StatusCode });
+            responseOut.StatusCode = (int) response.StatusCode;
+
+            // Forward the HTTP headers
+            foreach (var header in response.Headers)
+            {
+                if (ExcludedResponseHeaders.Contains(header.Key.ToLowerInvariant()))
+                {
+                    this.log.Debug("Ignoring response header", () => new { header.Key, header.Value });
+                    continue;
+                }
+
+                this.log.Debug("Adding response header", () => new { header.Key, header.Value });
+                foreach (var value in header.Value)
+                {
+                    responseOut.Headers.Add(header.Key, value);
+                }
+            }
+
+            // Some status codes like 204 and 304 can't have a body
+            if (response.CanHaveBody && !string.IsNullOrEmpty(response.Content))
+            {
+                await responseOut.WriteAsync(response.Content);
+            }
+        }
+
+        private string GetRequestPayload(HttpRequest request)
         {
             string text;
             var memstream = new MemoryStream();
@@ -171,7 +202,15 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
             using (var reader = new StreamReader(memstream))
             {
                 text = reader.ReadToEnd();
+
+                // TODO: throw the error before loading the entire payload in memory
+                if (text.Length > this.config.MaxPayloadSize)
+                {
+                    this.log.Warn("User request payloaad is too large", () => new { text.Length });
+                    throw new RequestPayloadTooLargeException();
+                }
             }
+
             return text;
         }
     }

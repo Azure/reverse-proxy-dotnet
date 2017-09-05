@@ -1,9 +1,9 @@
-﻿{
+{
   "iisSettings": {
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "http://localhost:9000/",
+      "applicationUrl": "http://localhost:10080/",
       "sslPort": 0
     }
   },
@@ -12,16 +12,19 @@
       "commandName": "IISExpress",
       "launchBrowser": true,
       "environmentVariables": {
+        "REMOTE_ENDPOINT": "http://vm-snjz6.westus.cloudapp.azure.com",
+        "Key": "Value",
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "WebApplication2": {
+    "ProxyAgent": {
       "commandName": "Project",
       "launchBrowser": true,
+      "launchUrl": "status",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
-      "applicationUrl": "http://localhost:9000"
+      "applicationUrl": "http://localhost:10081"
     }
   }
 }
