@@ -81,7 +81,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.HttpClient
 
         public bool UsesSsl()
         {
-            return this.Uri.Host.ToLowerInvariant().StartsWith("https://");
+            return this.Uri.AbsoluteUri.ToLowerInvariant().StartsWith("https://");
         }
 
         public IHttpRequest AddHeader(string name, string value)
