@@ -38,9 +38,6 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
 
         // Headers returned by the remote endpoint
         // which are not returned to the client
-
-        // HTTP methods with a payload
-
         private static readonly HashSet<string> ExcludedResponseHeaders =
             new HashSet<string>
             {

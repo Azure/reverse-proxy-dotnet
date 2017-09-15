@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft. All rights reserved.
 
 using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Azure.IoTSolutions.ReverseProxy.Diagnostics;
@@ -27,6 +28,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.HttpClient
     public class HttpClient : IHttpClient
     {
         private readonly ILogger log;
+        private const string CONTENT_TYPE_HEADER = "Content-Type";
 
         public HttpClient(ILogger logger)
         {
@@ -79,12 +81,20 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.HttpClient
                     RequestUri = request.Uri
                 };
 
+                // Keep track of headers added on the content to avoid duplications
+                // which could lead to invalid headers like
+                // -> "Content-Type: application/json, application/json"
+                var headersOnContentObject = new HashSet<string>();
+
                 SetServerSslSecurity(request, clientHandler);
                 SetTimeout(request, client);
-                SetContent(request, httpMethod, httpRequest);
-                SetHeaders(request, httpRequest);
+                // Note: SetContent must be called before SetHeaders to prioritize the 
+                // Content Type value set in the content.
+                // TODO: ensure that's what happens with a unit test
+                SetContent(request, httpMethod, httpRequest, ref headersOnContentObject);
+                SetHeaders(request, httpRequest, ref headersOnContentObject);
 
-                this.log.Debug("Sending request", () => new { httpMethod, request.Uri, request.Options });
+                this.log.Debug("Sending request", () => new {httpMethod, request.Uri, request.Options});
 
                 try
                 {
@@ -154,24 +164,41 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.HttpClient
             }
         }
 
-        private static void SetContent(IHttpRequest request, HttpMethod httpMethod, HttpRequestMessage httpRequest)
+        private void SetContent(
+            IHttpRequest request,
+            HttpMethod httpMethod,
+            HttpRequestMessage httpRequest,
+            ref HashSet<string> headersOnContentObject)
         {
             if (httpMethod != HttpMethod.Post && httpMethod != HttpMethod.Put) return;
 
             httpRequest.Content = request.Content;
             if (request.ContentType != null && request.Content != null)
             {
+                headersOnContentObject.Add(CONTENT_TYPE_HEADER.ToLowerInvariant());
                 httpRequest.Content.Headers.ContentType = request.ContentType;
             }
         }
 
-        private static void SetHeaders(IHttpRequest request, HttpRequestMessage httpRequest)
+        private void SetHeaders(
+            IHttpRequest request,
+            HttpRequestMessage httpRequest,
+            ref HashSet<string> headersOnContentObject)
         {
             foreach (var header in request.Headers)
             {
-                if (!httpRequest.Headers.TryAddWithoutValidation(header.Key, header.Value))
+                if (!headersOnContentObject.Contains(header.Key.ToLowerInvariant()))
                 {
-                    httpRequest.Content?.Headers?.TryAddWithoutValidation(header.Key, header.Value);
+                    if (!httpRequest.Headers.TryAddWithoutValidation(header.Key, header.Value))
+                    {
+                        httpRequest.Content?.Headers?.TryAddWithoutValidation(header.Key, header.Value);
+                        headersOnContentObject.Add(header.Key.ToLowerInvariant());
+                    }
+                }
+                else
+                {
+                    this.log.Debug("Skipping header already present in the content object",
+                        () => new {header.Key, header.Value});
                 }
             }
         }
