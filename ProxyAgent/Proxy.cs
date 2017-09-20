@@ -16,6 +16,8 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
 {
     public interface IProxy
     {
+        Task<ProxyStatus> PingAsync();
+
         Task ProcessAsync(
             string hostname,
             HttpRequest requestIn,
@@ -65,6 +67,28 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
             this.client = httpclient;
             this.config = config;
             this.log = log;
+        }
+
+        public async Task<ProxyStatus> PingAsync()
+        {
+            var request = new HttpClient.HttpRequest();
+            request.SetUriFromString(this.config.Endpoint);
+            request.Options.EnsureSuccess = false;
+            request.Options.Timeout = 5000;
+
+            // TODO: verify the remote identity
+            request.Options.AllowInsecureSslServer = true;
+
+            var response = await this.client.GetAsync(request);
+            var content = response.Content.Length > 80
+                ? response.Content.Substring(0, 80) + "..."
+                : response.Content;
+
+            return new ProxyStatus
+            {
+                StatusCode = (int) response.StatusCode,
+                Message = content
+            };
         }
 
         public async Task ProcessAsync(

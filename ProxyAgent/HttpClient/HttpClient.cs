@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Azure.IoTSolutions.ReverseProxy.Diagnostics;
@@ -91,10 +92,10 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.HttpClient
                 // Note: SetContent must be called before SetHeaders to prioritize the 
                 // Content Type value set in the content.
                 // TODO: ensure that's what happens with a unit test
-                SetContent(request, httpMethod, httpRequest, ref headersOnContentObject);
-                SetHeaders(request, httpRequest, ref headersOnContentObject);
+                this.SetContent(request, httpMethod, httpRequest, ref headersOnContentObject);
+                this.SetHeaders(request, httpRequest, ref headersOnContentObject);
 
-                this.log.Debug("Sending request", () => new {httpMethod, request.Uri, request.Options});
+                this.log.Debug("Sending request", () => new { httpMethod, request.Uri, request.Options });
 
                 try
                 {
@@ -132,8 +133,22 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.HttpClient
 
                     return new HttpResponse
                     {
-                        StatusCode = 0,
+                        StatusCode = HttpStatusCode.BadGateway,
                         Content = errorMessage
+                    };
+                }
+                catch (PlatformNotSupportedException e)
+                {
+                    // For instance, on some OSes, .NET Core doesn't yet
+                    // support ServerCertificateCustomValidationCallback
+
+                    this.log.Error("Sorry, your system does not support the requested feature.",
+                        () => new { e });
+
+                    return new HttpResponse
+                    {
+                        StatusCode = 0,
+                        Content = e.Message
                     };
                 }
                 catch (TaskCanceledException e)
@@ -198,7 +213,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.HttpClient
                 else
                 {
                     this.log.Debug("Skipping header already present in the content object",
-                        () => new {header.Key, header.Value});
+                        () => new { header.Key, header.Value });
                 }
             }
         }
