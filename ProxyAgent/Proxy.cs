@@ -27,7 +27,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
     public class Proxy : IProxy
     {
         private const string LOCATION_HEADER = "Location";
-        private const string STS_HEADER = "Strict-Transport-Security";
+        private const string HSTS_HEADER = "Strict-Transport-Security";
 
         // Headers not forwarded to the remote endpoint
         private static readonly HashSet<string> ExcludedRequestHeaders =
@@ -51,8 +51,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
                 "server",
                 "transfer-encoding",
                 "upgrade",
-                LOCATION_HEADER,
-                STS_HEADER
+                HSTS_HEADER
             };
 
         private static readonly HashSet<string> MethodsWithPayload =
@@ -238,7 +237,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
             // connections and inject the header or remove it.
             if (requestIn.IsHttps && this.config.StrictTransportSecurityEnabled)
             {
-                responseOut.Headers.Add(STS_HEADER, "max-age=" + this.config.StrictTransportSecurityPeriod);
+                responseOut.Headers.Add(HSTS_HEADER, "max-age=" + this.config.StrictTransportSecurityPeriod);
             }
 
             // Some status codes like 204 and 304 can't have a body
