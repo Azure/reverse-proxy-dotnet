@@ -28,7 +28,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.HttpClient
 
     public class HttpResponse : IHttpResponse
     {
-        private const int TooManyRequests = 429;
+        private const int TOO_MANY_REQUESTS = 429;
 
         public HttpResponse()
         {
@@ -64,7 +64,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.HttpClient
 
         public bool IsRetriableError => this.StatusCode == HttpStatusCode.NotFound ||
                                         this.StatusCode == HttpStatusCode.RequestTimeout ||
-                                        (int) this.StatusCode == TooManyRequests;
+                                        (int) this.StatusCode == TOO_MANY_REQUESTS;
 
         public bool IsBadRequest => (int) this.StatusCode == 400;
         public bool IsUnauthorized => (int) this.StatusCode == 401;

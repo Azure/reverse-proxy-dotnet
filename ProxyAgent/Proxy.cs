@@ -100,11 +100,18 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
 
             try
             {
+                this.RedirectToHttpsIfNeeded(requestIn);
                 request = this.BuildRequest(requestIn, hostname);
             }
             catch (RequestPayloadTooLargeException)
             {
                 responseOut.StatusCode = (int) HttpStatusCode.RequestEntityTooLarge;
+                return;
+            }
+            catch (RedirectException e)
+            {
+                responseOut.StatusCode = (int) e.StatusCode;
+                responseOut.Headers.Add(LOCATION_HEADER, e.Location);
                 return;
             }
 
@@ -141,7 +148,15 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
                     return;
             }
 
-            await this.BuildResponseAsync(response, responseOut);
+            await this.BuildResponseAsync(response, responseOut, requestIn);
+        }
+
+        private void RedirectToHttpsIfNeeded(HttpRequest requestIn)
+        {
+            if (requestIn.IsHttps || !this.config.RedirectHttpToHttps) return;
+
+            var location = "https://" + requestIn.Host + requestIn.Path.Value + requestIn.QueryString;
+            throw new RedirectException(HttpStatusCode.Moved, location);
         }
 
         // Prepare the request to send to the remote endpoint
