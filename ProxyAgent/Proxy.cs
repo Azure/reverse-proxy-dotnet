@@ -26,6 +26,9 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
 
     public class Proxy : IProxy
     {
+        private const string LOCATION_HEADER = "Location";
+        private const string STS_HEADER = "Strict-Transport-Security";
+
         // Headers not forwarded to the remote endpoint
         private static readonly HashSet<string> ExcludedRequestHeaders =
             new HashSet<string>
@@ -43,11 +46,13 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
         private static readonly HashSet<string> ExcludedResponseHeaders =
             new HashSet<string>
             {
-                "connection", 
-                "content-length", 
-                "server", 
+                "connection",
+                "content-length",
+                "server",
                 "transfer-encoding",
                 "upgrade",
+                LOCATION_HEADER,
+                STS_HEADER
             };
 
         private static readonly HashSet<string> MethodsWithPayload =
@@ -200,26 +205,40 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
             return requestOut;
         }
 
-        private async Task BuildResponseAsync(IHttpResponse response, HttpResponse responseOut)
+        private async Task BuildResponseAsync(IHttpResponse response, HttpResponse responseOut, HttpRequest requestIn)
         {
             // Forward the HTTP status code
             this.log.Debug("Status code", () => new { response.StatusCode });
             responseOut.StatusCode = (int) response.StatusCode;
 
-            // Forward the HTTP headers
-            foreach (var header in response.Headers)
+            // The Headers property can be null in case of errors
+            if (response.Headers != null)
             {
-                if (ExcludedResponseHeaders.Contains(header.Key.ToLowerInvariant()))
+                // Forward the HTTP headers
+                foreach (var header in response.Headers)
                 {
-                    this.log.Debug("Ignoring response header", () => new { header.Key, header.Value });
-                    continue;
-                }
+                    if (ExcludedResponseHeaders.Contains(header.Key.ToLowerInvariant()))
+                    {
+                        this.log.Debug("Ignoring response header", () => new { header.Key, header.Value });
+                        continue;
+                    }
 
-                this.log.Debug("Adding response header", () => new { header.Key, header.Value });
-                foreach (var value in header.Value)
-                {
-                    responseOut.Headers.Add(header.Key, value);
+                    this.log.Debug("Adding response header", () => new { header.Key, header.Value });
+                    foreach (var value in header.Value)
+                    {
+                        responseOut.Headers.Add(header.Key, value);
+                    }
                 }
+            }
+
+            // HSTS support
+            // See: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Strict-Transport-Security
+            // Note: The Strict-Transport-Security header is ignored by the browser when your
+            // site is accessed using HTTP; this is because an attacker may intercept HTTP
+            // connections and inject the header or remove it.
+            if (requestIn.IsHttps && this.config.StrictTransportSecurityEnabled)
+            {
+                responseOut.Headers.Add(STS_HEADER, "max-age=" + this.config.StrictTransportSecurityPeriod);
             }
 
             // Some status codes like 204 and 304 can't have a body
