@@ -46,7 +46,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.Runtime
 
         private const string APPLICATION_KEY = "reverseproxy:";
         private const string ENDPOINT_KEY = APPLICATION_KEY + "endpoint";
-        private const string REDIRECTHTTP_KEY = APPLICATION_KEY + "redirectHttpToHttps";
+        private const string REDIRECT_HTTP_KEY = APPLICATION_KEY + "redirectHttpToHttps";
         private const string STS_ENABLED_KEY = APPLICATION_KEY + "strictTransportSecurityEnabled";
         private const string STS_PERIOD_KEY = APPLICATION_KEY + "strictTransportSecurityPeriod";
         private const string MAX_PAYLOAD_SIZE_KEY = APPLICATION_KEY + "maxPayloadSize";
@@ -69,7 +69,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.Runtime
             this.ConfigStatus = configData.GetBool(CONFIG_STATUS_KEY, CONFIG_STATUS_DEFAULT);
             this.MaxPayloadSize = configData.GetInt(MAX_PAYLOAD_SIZE_KEY, MAX_PAYLOAD_SIZE_DEFAULT);
 
-            this.RedirectHttpToHttps = configData.GetBool(REDIRECTHTTP_KEY, REDIRECT_HTTP_DEFAULT);
+            this.RedirectHttpToHttps = configData.GetBool(REDIRECT_HTTP_KEY, REDIRECT_HTTP_DEFAULT);
             this.StrictTransportSecurityEnabled = configData.GetBool(STS_ENABLED_KEY, STS_ENABLED_DEFAULT);
             this.StrictTransportSecurityPeriod = configData.GetInt(STS_PERIOD_KEY, STS_PERIOD_DEFAULT);
 
