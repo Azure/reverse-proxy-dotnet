@@ -15,6 +15,7 @@ ProjectSection(SolutionItems) = preProject
 	LICENSE = LICENSE
 	README.md = README.md
 	reverse-proxy.sln.DotSettings = reverse-proxy.sln.DotSettings
+	version = version
 EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{B2E55E7C-7EDF-429A-BF44-69BD28CDA4E7}"

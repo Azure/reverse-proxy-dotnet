@@ -16,6 +16,8 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
 {
     public interface IProxy
     {
+        Task<ProxyStatus> PingAsync();
+
         Task ProcessAsync(
             string hostname,
             HttpRequest requestIn,
@@ -24,6 +26,9 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
 
     public class Proxy : IProxy
     {
+        private const string LOCATION_HEADER = "Location";
+        private const string HSTS_HEADER = "Strict-Transport-Security";
+
         // Headers not forwarded to the remote endpoint
         private static readonly HashSet<string> ExcludedRequestHeaders =
             new HashSet<string>
@@ -41,11 +46,12 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
         private static readonly HashSet<string> ExcludedResponseHeaders =
             new HashSet<string>
             {
-                "connection", 
-                "content-length", 
-                "server", 
+                "connection",
+                "content-length",
+                "server",
                 "transfer-encoding",
                 "upgrade",
+                HSTS_HEADER
             };
 
         private static readonly HashSet<string> MethodsWithPayload =
@@ -67,6 +73,28 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
             this.log = log;
         }
 
+        public async Task<ProxyStatus> PingAsync()
+        {
+            var request = new HttpClient.HttpRequest();
+            request.SetUriFromString(this.config.Endpoint);
+            request.Options.EnsureSuccess = false;
+            request.Options.Timeout = 5000;
+
+            // TODO: verify the remote identity
+            request.Options.AllowInsecureSslServer = true;
+
+            var response = await this.client.GetAsync(request);
+            var content = response.Content.Length > 80
+                ? response.Content.Substring(0, 80) + "..."
+                : response.Content;
+
+            return new ProxyStatus
+            {
+                StatusCode = (int) response.StatusCode,
+                Message = content
+            };
+        }
+
         public async Task ProcessAsync(
             string hostname,
             HttpRequest requestIn,
@@ -76,11 +104,18 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
 
             try
             {
+                this.RedirectToHttpsIfNeeded(requestIn);
                 request = this.BuildRequest(requestIn, hostname);
             }
             catch (RequestPayloadTooLargeException)
             {
                 responseOut.StatusCode = (int) HttpStatusCode.RequestEntityTooLarge;
+                return;
+            }
+            catch (RedirectException e)
+            {
+                responseOut.StatusCode = (int) e.StatusCode;
+                responseOut.Headers.Add(LOCATION_HEADER, e.Location);
                 return;
             }
 
@@ -117,7 +152,15 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
                     return;
             }
 
-            await this.BuildResponseAsync(response, responseOut);
+            await this.BuildResponseAsync(response, responseOut, requestIn);
+        }
+
+        private void RedirectToHttpsIfNeeded(HttpRequest requestIn)
+        {
+            if (requestIn.IsHttps || !this.config.RedirectHttpToHttps) return;
+
+            var location = "https://" + requestIn.Host + requestIn.Path.Value + requestIn.QueryString;
+            throw new RedirectException(HttpStatusCode.Moved, location);
         }
 
         // Prepare the request to send to the remote endpoint
@@ -161,26 +204,40 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
             return requestOut;
         }
 
-        private async Task BuildResponseAsync(IHttpResponse response, HttpResponse responseOut)
+        private async Task BuildResponseAsync(IHttpResponse response, HttpResponse responseOut, HttpRequest requestIn)
         {
             // Forward the HTTP status code
             this.log.Debug("Status code", () => new { response.StatusCode });
             responseOut.StatusCode = (int) response.StatusCode;
 
-            // Forward the HTTP headers
-            foreach (var header in response.Headers)
+            // The Headers property can be null in case of errors
+            if (response.Headers != null)
             {
-                if (ExcludedResponseHeaders.Contains(header.Key.ToLowerInvariant()))
+                // Forward the HTTP headers
+                foreach (var header in response.Headers)
                 {
-                    this.log.Debug("Ignoring response header", () => new { header.Key, header.Value });
-                    continue;
-                }
+                    if (ExcludedResponseHeaders.Contains(header.Key.ToLowerInvariant()))
+                    {
+                        this.log.Debug("Ignoring response header", () => new { header.Key, header.Value });
+                        continue;
+                    }
 
-                this.log.Debug("Adding response header", () => new { header.Key, header.Value });
-                foreach (var value in header.Value)
-                {
-                    responseOut.Headers.Add(header.Key, value);
+                    this.log.Debug("Adding response header", () => new { header.Key, header.Value });
+                    foreach (var value in header.Value)
+                    {
+                        responseOut.Headers.Add(header.Key, value);
+                    }
                 }
+            }
+
+            // HSTS support
+            // See: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Strict-Transport-Security
+            // Note: The Strict-Transport-Security header is ignored by the browser when your
+            // site is accessed using HTTP; this is because an attacker may intercept HTTP
+            // connections and inject the header or remove it.
+            if (requestIn.IsHttps && this.config.StrictTransportSecurityEnabled)
+            {
+                responseOut.Headers.Add(HSTS_HEADER, "max-age=" + this.config.StrictTransportSecurityPeriod);
             }
 
             // Some status codes like 204 and 304 can't have a body
