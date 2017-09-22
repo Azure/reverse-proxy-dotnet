@@ -54,9 +54,6 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
                 HSTS_HEADER
             };
 
-        private static readonly HashSet<string> MethodsWithPayload =
-            new HashSet<string> { "POST", "PUT", "PATCH" };
-
         private readonly IHttpClient client;
 
         private readonly IConfig config;
@@ -190,7 +187,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
 
             // Forward request payload
             var method = requestIn.Method.ToUpperInvariant();
-            if (MethodsWithPayload.Contains(method))
+            if (HttpClient.HttpClient.MethodsWithPayload.Contains(method))
             {
                 requestOut.SetContent(this.GetRequestPayload(requestIn));
             }
