@@ -31,7 +31,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.Controllers
                 status = "ERROR:" + ping.Message;
             }
 
-            if (this.config.ConfigStatus)
+            if (this.config.StatusEndpointEnabled)
             {
                 return new Dictionary<string, string>
                 {

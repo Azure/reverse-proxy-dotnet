@@ -40,7 +40,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
         private static void SetupCustomRules(ContainerBuilder builder)
         {
             // Make sure the configuration is read only once.
-            IConfig config = new Config(new ConfigData());
+            IConfig config = new Config(new ConfigData(new Logger(Uptime.ProcessId, LogLevel.Info)));
             builder.RegisterInstance(config).As<IConfig>().SingleInstance();
 
             // Instantiate only one logger

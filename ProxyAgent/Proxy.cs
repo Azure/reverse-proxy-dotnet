@@ -255,6 +255,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
                 text = reader.ReadToEnd();
 
                 // TODO: throw the error before loading the entire payload in memory
+                //       use Kestrel options in .NET Core 2.0 to limit the payload size 
                 if (text.Length > this.config.MaxPayloadSize)
                 {
                     this.log.Warn("User request payloaad is too large", () => new { text.Length });

@@ -28,7 +28,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.Runtime
         int MaxPayloadSize { get; }
 
         // Whether to expose configuration settings in /status
-        bool ConfigStatus { get; }
+        bool StatusEndpointEnabled { get; }
 
         // Application logging level
         LogLevel LogLevel { get; }
@@ -40,17 +40,17 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.Runtime
         private const bool REDIRECT_HTTP_DEFAULT = true;
         private const bool STS_ENABLED_DEFAULT = true;
         private const int STS_PERIOD_DEFAULT = 2592000;
-        private const int MAX_PAYLOAD_SIZE_DEFAULT = 131072;
-        private const bool CONFIG_STATUS_DEFAULT = false;
-        private const string LOG_LEVEL_DEFAULT = "Warn";
+        private const int MAX_PAYLOAD_SIZE_DEFAULT = 102400;
+        private const bool STATUS_ENDPOINT_ENABLED_DEFAULT = false;
+        private const LogLevel LOG_LEVEL_DEFAULT = LogLevel.Warn;
 
-        private const string APPLICATION_KEY = "reverseproxy:";
+        private const string APPLICATION_KEY = "ReverseProxy:";
         private const string ENDPOINT_KEY = APPLICATION_KEY + "endpoint";
         private const string REDIRECT_HTTP_KEY = APPLICATION_KEY + "redirectHttpToHttps";
         private const string STS_ENABLED_KEY = APPLICATION_KEY + "strictTransportSecurityEnabled";
         private const string STS_PERIOD_KEY = APPLICATION_KEY + "strictTransportSecurityPeriod";
         private const string MAX_PAYLOAD_SIZE_KEY = APPLICATION_KEY + "maxPayloadSize";
-        private const string CONFIG_STATUS_KEY = APPLICATION_KEY + "configStatus";
+        private const string STATUS_ENDPOINT_ENABLED_KEY = APPLICATION_KEY + "statusEndpointEnabled";
         private const string LOG_LEVEL_KEY = APPLICATION_KEY + "loglevel";
 
         public string Endpoint { get; }
@@ -58,15 +58,15 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.Runtime
         public bool StrictTransportSecurityEnabled { get; }
         public int StrictTransportSecurityPeriod { get; }
         public int MaxPayloadSize { get; }
-        public bool ConfigStatus { get; }
+        public bool StatusEndpointEnabled { get; }
         public LogLevel LogLevel { get; }
 
         public Config(IConfigData configData)
         {
-            Enum.TryParse(configData.GetString(LOG_LEVEL_KEY, LOG_LEVEL_DEFAULT), out LogLevel logLevel);
+            Enum.TryParse(configData.GetString(LOG_LEVEL_KEY, LOG_LEVEL_DEFAULT.ToString()), out LogLevel logLevel);
             this.LogLevel = logLevel;
 
-            this.ConfigStatus = configData.GetBool(CONFIG_STATUS_KEY, CONFIG_STATUS_DEFAULT);
+            this.StatusEndpointEnabled = configData.GetBool(STATUS_ENDPOINT_ENABLED_KEY, STATUS_ENDPOINT_ENABLED_DEFAULT);
             this.MaxPayloadSize = configData.GetInt(MAX_PAYLOAD_SIZE_KEY, MAX_PAYLOAD_SIZE_DEFAULT);
 
             this.RedirectHttpToHttps = configData.GetBool(REDIRECT_HTTP_KEY, REDIRECT_HTTP_DEFAULT);
