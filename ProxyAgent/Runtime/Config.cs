@@ -42,7 +42,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.Runtime
         // By default browsers will persist the HSTS rule for 1 month.
         private const int STS_PERIOD_DEFAULT = 2592000;
         // By default requests with a payload bigger than 100Kb are refused.
-        // In IoT scenario this works fine because requests typically are limited to 64Kb.
+        // In IoT scenarios the setting works fine because requests typically are limited to 64Kb.
         private const int MAX_PAYLOAD_SIZE_DEFAULT = 102400;
         private const bool STATUS_ENDPOINT_ENABLED_DEFAULT = false;
         private const LogLevel LOG_LEVEL_DEFAULT = LogLevel.Warn;
