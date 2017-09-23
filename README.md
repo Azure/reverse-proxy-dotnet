@@ -35,14 +35,38 @@ The [scripts](scripts) folder contains scripts for some frequent tasks:
 The service is designed to be deployed as an 
 [Azure Web App](https://docs.microsoft.com/en-us/azure/app-service-web/app-service-web-tutorial-custom-SSL),
 reusing the SSL encryption provided by the platform, to expose, for example,
-private services hosted in Azure VMs, Cloud Apps, etc.
+private services hosted in Azure VMs, Cloud Apps, etc. When deploying
+via Azure Web Apps, remember to set the remote endpoint setting, under
+"Application settings"
 
 However, you can easily extend the code to use a custom certificate,
 see the
 [documentation](https://azure.github.io/reverse-proxy-dotnet/ssl-setup.html)
 for more information.
 
+## Configuration
 
+The service has one mandatory value for the remote endpoint, and some optional
+settings with a default value, that can be overridden if required:
+
+* `endpoint`: this is the full URL of the remote endpoint where all requests
+  are routed to.
+  Environment variable: `REMOTE_ENDPOINT`.
+* `redirectHttpToHttps`: optional value to decide whether HTTP requests should
+  be redirected to HTTPS (default: true).
+  Environment variable: `REDIRECT_HTTP_TO_HTTPS`.
+* `strictTransportSecurityEnabled`: whether to enable HSTS (default: true).
+  Environment variable: `HSTS_ENABLED`.
+* `strictTransportSecurityPeriod`: how long to persist HSTS rules in the
+  clients, in seconds (default: 30 days).
+  Environment variable: `HSTS_PERIOD`.
+* `statusEndpointEnabled`: whether to expose extra information in the /status
+  endpoint (default: false).
+  Environment variable: `STATUS_ENDPOINT_ENABLED`.
+* `maxPayloadSize`: the maximum size of requests' payload (default: 100Kb).
+  Environment variable: `MAX_PAYLOAD_SIZE`.
+* `loglevel`: application logging level (default: Warn).
+  Environment variable: `LOG_LEVEL`.
 
 [build-badge]: https://img.shields.io/travis/Azure/reverse-proxy-dotnet.svg
 [build-url]: https://travis-ci.org/Azure/reverse-proxy-dotnet
