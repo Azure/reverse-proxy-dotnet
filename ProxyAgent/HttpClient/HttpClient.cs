@@ -31,6 +31,8 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.HttpClient
         private readonly ILogger log;
         private const string CONTENT_TYPE_HEADER = "Content-Type";
 
+        public static HashSet<string> MethodsWithPayload => new HashSet<string> { "POST", "PUT", "PATCH" };
+
         public HttpClient(ILogger logger)
         {
             this.log = logger;
@@ -185,7 +187,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.HttpClient
             HttpRequestMessage httpRequest,
             ref HashSet<string> headersOnContentObject)
         {
-            if (httpMethod != HttpMethod.Post && httpMethod != HttpMethod.Put) return;
+            if (!MethodsWithPayload.Contains(httpMethod.Method.ToUpperInvariant())) return;
 
             httpRequest.Content = request.Content;
             if (request.ContentType != null && request.Content != null)

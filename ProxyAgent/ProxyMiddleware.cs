@@ -31,6 +31,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
             try
             {
                 await this.proxy.ProcessAsync(this.hostname, context.Request, context.Response);
+                this.log.Debug("--------------------------------------------------------------------------------", () => { });
             }
             catch (Exception e)
             {

@@ -54,9 +54,6 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
                 HSTS_HEADER
             };
 
-        private static readonly HashSet<string> MethodsWithPayload =
-            new HashSet<string> { "POST", "PUT", "PATCH" };
-
         private readonly IHttpClient client;
 
         private readonly IConfig config;
@@ -190,7 +187,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
 
             // Forward request payload
             var method = requestIn.Method.ToUpperInvariant();
-            if (MethodsWithPayload.Contains(method))
+            if (HttpClient.HttpClient.MethodsWithPayload.Contains(method))
             {
                 requestOut.SetContent(this.GetRequestPayload(requestIn));
             }
@@ -258,6 +255,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
                 text = reader.ReadToEnd();
 
                 // TODO: throw the error before loading the entire payload in memory
+                //       use Kestrel options in .NET Core 2.0 to limit the payload size 
                 if (text.Length > this.config.MaxPayloadSize)
                 {
                     this.log.Warn("User request payloaad is too large", () => new { text.Length });
