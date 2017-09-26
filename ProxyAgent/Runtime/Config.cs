@@ -15,6 +15,9 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.Runtime
         // The remote endpoint the proxy communicates with
         string Endpoint { get; }
 
+        // The remote endpoint ssl certificate thumbprint the proxy communicates with
+        string Thumbprint { get; }
+
         // Whether to redirect HTTP requests to HTTPS
         bool RedirectHttpToHttps { get; }
 
@@ -49,6 +52,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.Runtime
 
         private const string APPLICATION_KEY = "ReverseProxy:";
         private const string ENDPOINT_KEY = APPLICATION_KEY + "endpoint";
+        private const string THUMBPRINT_KEY = APPLICATION_KEY + "thumbprint";
         private const string REDIRECT_HTTP_KEY = APPLICATION_KEY + "redirectHttpToHttps";
         private const string STS_ENABLED_KEY = APPLICATION_KEY + "strictTransportSecurityEnabled";
         private const string STS_PERIOD_KEY = APPLICATION_KEY + "strictTransportSecurityPeriod";
@@ -57,6 +61,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.Runtime
         private const string LOG_LEVEL_KEY = APPLICATION_KEY + "loglevel";
 
         public string Endpoint { get; }
+        public string Thumbprint { get; }
         public bool RedirectHttpToHttps { get; }
         public bool StrictTransportSecurityEnabled { get; }
         public int StrictTransportSecurityPeriod { get; }
@@ -77,6 +82,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.Runtime
             this.StrictTransportSecurityPeriod = configData.GetInt(STS_PERIOD_KEY, STS_PERIOD_DEFAULT);
 
             this.Endpoint = configData.GetString(ENDPOINT_KEY);
+            this.Thumbprint = configData.GetString(THUMBPRINT_KEY);
             if (string.IsNullOrEmpty(this.Endpoint))
             {
                 throw new InvalidConfigurationException("The remote endpoint hostname is empty.");
