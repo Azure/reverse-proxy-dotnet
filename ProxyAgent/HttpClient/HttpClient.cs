@@ -232,10 +232,12 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.HttpClient
                 clientHandler.ServerCertificateCustomValidationCallback += delegate(HttpRequestMessage sender, X509Certificate2 cert, X509Chain chain, SslPolicyErrors error)
                 {
                     var sslThumbprint = cert.Thumbprint.ToLowerInvariant();
-                    var configThumbprint = this.config.Thumbprint.ToLowerInvariant();
+                    var configThumbprint = this.config.SSLCertThumbprint.ToLowerInvariant();
                     if (sslThumbprint  != configThumbprint)
                     {
-                        this.log.Error("The thumbprint provided by the client don't match", () => new { sslThumbprint, configThumbprint });
+                        this.log.Error("The remote endpoint is using an unknown/invalid SSL certificate, " +
+                                       "the thumbprint of the certificate doesn't match the value in the configuration",
+                                        () => new { sslThumbprint, configThumbprint });
                         return false;
                     }
                     else
