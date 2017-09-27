@@ -4,8 +4,11 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Microsoft.Azure.IoTSolutions.ReverseProxy.Diagnostics;
+using Microsoft.Azure.IoTSolutions.ReverseProxy.Runtime;
 
 namespace Microsoft.Azure.IoTSolutions.ReverseProxy.HttpClient
 {
@@ -29,13 +32,15 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.HttpClient
     public class HttpClient : IHttpClient
     {
         private readonly ILogger log;
+        private readonly IConfig config;
         private const string CONTENT_TYPE_HEADER = "Content-Type";
 
         public static HashSet<string> MethodsWithPayload => new HashSet<string> { "POST", "PUT", "PATCH" };
 
-        public HttpClient(ILogger logger)
+        public HttpClient(ILogger logger, IConfig config)
         {
             this.log = logger;
+            this.config = config;
         }
 
         public async Task<IHttpResponse> GetAsync(IHttpRequest request)
@@ -220,11 +225,26 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.HttpClient
             }
         }
 
-        private static void SetServerSslSecurity(IHttpRequest request, HttpClientHandler clientHandler)
+        private void SetServerSslSecurity(IHttpRequest request, HttpClientHandler clientHandler)
         {
             if (request.Options.AllowInsecureSslServer && request.UsesSsl())
             {
-                clientHandler.ServerCertificateCustomValidationCallback = delegate { return true; };
+                clientHandler.ServerCertificateCustomValidationCallback += delegate(HttpRequestMessage sender, X509Certificate2 cert, X509Chain chain, SslPolicyErrors error)
+                {
+                    var sslThumbprint = cert.Thumbprint.ToLowerInvariant();
+                    var configThumbprint = this.config.SSLCertThumbprint.ToLowerInvariant();
+                    if (sslThumbprint  != configThumbprint)
+                    {
+                        this.log.Error("The remote endpoint is using an unknown/invalid SSL certificate, " +
+                                       "the thumbprint of the certificate doesn't match the value in the configuration",
+                                        () => new { sslThumbprint, configThumbprint });
+                        return false;
+                    }
+                    else
+                    {
+                        return true;
+                    }
+                };
             }
         }
 
