@@ -88,10 +88,10 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.Runtime
         private void ProcessMandatoryPlaceholders(ref string value)
         {
             // Pattern for mandatory replacements: ${VAR_NAME}
-            const string pattern = @"\${([a-zA-Z_][a-zA-Z0-9_]*)}";
+            const string PATTERN = @"\${([a-zA-Z_][a-zA-Z0-9_]*)}";
 
             // Search
-            var keys = (from Match m in Regex.Matches(value, pattern)
+            var keys = (from Match m in Regex.Matches(value, PATTERN)
                 select m.Groups[1].Value).Distinct().ToArray();
 
             // Replace
@@ -104,7 +104,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.Runtime
             }
 
             // Non replaced placeholders cause an exception
-            keys = (from Match m in Regex.Matches(value, pattern)
+            keys = (from Match m in Regex.Matches(value, PATTERN)
                 select m.Groups[1].Value).ToArray();
             if (keys.Length > 0)
             {
@@ -119,10 +119,10 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.Runtime
             notFound = false;
 
             // Pattern for optional replacements: ${?VAR_NAME}
-            const string pattern = @"\${\?([a-zA-Z_][a-zA-Z0-9_]*)}";
+            const string PATTERN = @"\${\?([a-zA-Z_][a-zA-Z0-9_]*)}";
 
             // Search
-            var keys = (from Match m in Regex.Matches(value, pattern)
+            var keys = (from Match m in Regex.Matches(value, PATTERN)
                 select m.Groups[1].Value).Distinct().ToArray();
 
             // Replace
@@ -135,7 +135,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.Runtime
             }
 
             // Non replaced placeholders cause an exception
-            keys = (from Match m in Regex.Matches(value, pattern)
+            keys = (from Match m in Regex.Matches(value, PATTERN)
                 select m.Groups[1].Value).ToArray();
             if (keys.Length > 0)
             {
