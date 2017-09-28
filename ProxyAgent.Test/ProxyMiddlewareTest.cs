@@ -14,7 +14,7 @@ namespace ProxyAgent.Test
         [Fact]
         public void UsesProxy()
         {
-            const string endpoint = "http://foobar.com/v1";
+            const string ENDPOINT = "http://foobar.com/v1";
 
             // Arrange
             var next = new Mock<RequestDelegate>();
@@ -22,7 +22,7 @@ namespace ProxyAgent.Test
             var log = new Mock<ILogger>();
 
             var config = new Mock<IConfig>();
-            config.SetupGet(x => x.Endpoint).Returns(endpoint);
+            config.SetupGet(x => x.Endpoint).Returns(ENDPOINT);
 
             var request = new Mock<HttpRequest>();
             var response = new Mock<HttpResponse>();
@@ -36,7 +36,7 @@ namespace ProxyAgent.Test
             target.Invoke(context.Object).Wait();
 
             // Assert
-            proxy.Verify(x => x.ProcessAsync(endpoint, request.Object, response.Object), Times.Once);
+            proxy.Verify(x => x.ProcessAsync(ENDPOINT, request.Object, response.Object), Times.Once);
         }
     }
 }

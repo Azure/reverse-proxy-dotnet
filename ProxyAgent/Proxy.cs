@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
@@ -77,12 +78,12 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
             request.Options.EnsureSuccess = false;
             request.Options.Timeout = 5000;
 
-            // TODO: verify the remote identity
+            // The HTTP client uses cert. pinning, allowing self-signed certs
             request.Options.AllowInsecureSslServer = true;
 
             var response = await this.client.GetAsync(request);
-            var content = response.Content.Length > 80
-                ? response.Content.Substring(0, 80) + "..."
+            var content = response.Content.Length > 120
+                ? response.Content.Substring(0, 120) + "..."
                 : response.Content;
 
             return new ProxyStatus
@@ -98,7 +99,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
             HttpResponse responseOut)
         {
             IHttpRequest request;
-
+        
             try
             {
                 this.RedirectToHttpsIfNeeded(requestIn);
@@ -107,18 +108,20 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
             catch (RequestPayloadTooLargeException)
             {
                 responseOut.StatusCode = (int) HttpStatusCode.RequestEntityTooLarge;
+                ApplicationRequestRouting.DisableInstanceAffinity(responseOut);
                 return;
             }
             catch (RedirectException e)
             {
                 responseOut.StatusCode = (int) e.StatusCode;
                 responseOut.Headers.Add(LOCATION_HEADER, e.Location);
+                ApplicationRequestRouting.DisableInstanceAffinity(responseOut);
                 return;
             }
 
             IHttpResponse response;
             var method = requestIn.Method.ToUpperInvariant();
-            this.log.Debug("Request method", () => new { method });
+            this.log.Debug("Request method", () => new {method});
             switch (method)
             {
                 case "GET":
@@ -144,8 +147,9 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
                     break;
                 default:
                     // Note: this could flood the logs due to spiders...
-                    this.log.Info("Request method not supported", () => new { method });
+                    this.log.Info("Request method not supported", () => new {method});
                     responseOut.StatusCode = (int) HttpStatusCode.NotImplemented;
+                    ApplicationRequestRouting.DisableInstanceAffinity(responseOut);
                     return;
             }
 
@@ -170,11 +174,11 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
             {
                 if (ExcludedRequestHeaders.Contains(header.Key.ToLowerInvariant()))
                 {
-                    this.log.Debug("Ignoring request header", () => new { header.Key, header.Value });
+                    this.log.Debug("Ignoring request header", () => new {header.Key, header.Value});
                     continue;
                 }
 
-                this.log.Debug("Adding request header", () => new { header.Key, header.Value });
+                this.log.Debug("Adding request header", () => new {header.Key, header.Value});
                 foreach (var value in header.Value)
                 {
                     requestOut.AddHeader(header.Key, value);
@@ -182,7 +186,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
             }
 
             var url = toHostname + requestIn.Path.Value + requestIn.QueryString;
-            this.log.Debug("URL", () => new { url });
+            this.log.Debug("URL", () => new {url});
             requestOut.SetUriFromString(url);
 
             // Forward request payload
@@ -195,7 +199,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
             // Allow error codes without throwing an exception
             requestOut.Options.EnsureSuccess = false;
 
-            // TODO: verify the remote identity
+            // The HTTP client uses cert. pinning, allowing self-signed certs
             requestOut.Options.AllowInsecureSslServer = true;
 
             return requestOut;
@@ -204,7 +208,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
         private async Task BuildResponseAsync(IHttpResponse response, HttpResponse responseOut, HttpRequest requestIn)
         {
             // Forward the HTTP status code
-            this.log.Debug("Status code", () => new { response.StatusCode });
+            this.log.Debug("Status code", () => new {response.StatusCode});
             responseOut.StatusCode = (int) response.StatusCode;
 
             // The Headers property can be null in case of errors
@@ -215,11 +219,11 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
                 {
                     if (ExcludedResponseHeaders.Contains(header.Key.ToLowerInvariant()))
                     {
-                        this.log.Debug("Ignoring response header", () => new { header.Key, header.Value });
+                        this.log.Debug("Ignoring response header", () => new {header.Key, header.Value});
                         continue;
                     }
 
-                    this.log.Debug("Adding response header", () => new { header.Key, header.Value });
+                    this.log.Debug("Adding response header", () => new {header.Key, header.Value});
                     foreach (var value in header.Value)
                     {
                         responseOut.Headers.Add(header.Key, value);
@@ -236,6 +240,9 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
             {
                 responseOut.Headers.Add(HSTS_HEADER, "max-age=" + this.config.StrictTransportSecurityPeriod);
             }
+
+            // Last header before writing to the socket
+            ApplicationRequestRouting.DisableInstanceAffinity(responseOut);
 
             // Some status codes like 204 and 304 can't have a body
             if (response.CanHaveBody && !string.IsNullOrEmpty(response.Content))
@@ -258,7 +265,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
                 //       use Kestrel options in .NET Core 2.0 to limit the payload size 
                 if (text.Length > this.config.MaxPayloadSize)
                 {
-                    this.log.Warn("User request payloaad is too large", () => new { text.Length });
+                    this.log.Warn("User request payloaad is too large", () => new {text.Length});
                     throw new RequestPayloadTooLargeException();
                 }
             }

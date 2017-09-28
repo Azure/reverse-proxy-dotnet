@@ -11,3 +11,6 @@ obj/
 wwwroot/
 *_.sh
 *.userprefs
+*.csproj.user
+*.pubxml
+*.pubxml.user

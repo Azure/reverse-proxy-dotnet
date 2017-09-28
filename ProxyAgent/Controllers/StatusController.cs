@@ -7,7 +7,7 @@ using Microsoft.Azure.IoTSolutions.ReverseProxy.Runtime;
 
 namespace Microsoft.Azure.IoTSolutions.ReverseProxy.Controllers
 {
-    [Route("[controller]")]
+    [Route("ssl-proxy-status")]
     public class StatusController : Controller
     {
         private readonly IConfig config;
@@ -46,6 +46,10 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.Controllers
                     { "StrictTransportSecurityPeriod", this.config.StrictTransportSecurityPeriod.ToString() },
                 };
             }
+
+            // Disable IIS Application Request Routing (remove cookie)
+            // See https://azure.microsoft.com/blog/disabling-arrs-instance-affinity-in-windows-azure-web-sites
+            ApplicationRequestRouting.DisableInstanceAffinity(this.Response);
 
             return new Dictionary<string, string>
             {

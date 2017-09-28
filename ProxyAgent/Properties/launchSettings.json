@@ -19,7 +19,7 @@
     },
     "ProxyAgent": {
       "commandName": "Project",
-      "launchBrowser": true,
+      "launchBrowser": false,
       "launchUrl": "status",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
