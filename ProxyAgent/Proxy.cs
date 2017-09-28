@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
@@ -26,10 +27,6 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
 
     public class Proxy : IProxy
     {
-        // See https://azure.microsoft.com/en-us/blog/disabling-arrs-instance-affinity-in-windows-azure-web-sites/
-        public const string SESSION_AFFINITY_HEADER = "Arr-Disable-Session-Affinity";
-        public const string SESSION_AFFINITY_HEADER_VALUE = "True";
-
         private const string LOCATION_HEADER = "Location";
         private const string HSTS_HEADER = "Strict-Transport-Security";
 
@@ -81,12 +78,12 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
             request.Options.EnsureSuccess = false;
             request.Options.Timeout = 5000;
 
-            // TODO: verify the remote identity
+            // The HTTP client uses cert. pinning, allowing self-signed certs
             request.Options.AllowInsecureSslServer = true;
 
             var response = await this.client.GetAsync(request);
-            var content = response.Content.Length > 80
-                ? response.Content.Substring(0, 80) + "..."
+            var content = response.Content.Length > 120
+                ? response.Content.Substring(0, 120) + "..."
                 : response.Content;
 
             return new ProxyStatus
@@ -102,7 +99,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
             HttpResponse responseOut)
         {
             IHttpRequest request;
-
+        
             try
             {
                 this.RedirectToHttpsIfNeeded(requestIn);
@@ -111,16 +108,14 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
             catch (RequestPayloadTooLargeException)
             {
                 responseOut.StatusCode = (int) HttpStatusCode.RequestEntityTooLarge;
-                // Remove Azure's session affinity cookie
-                responseOut.Headers.Add(SESSION_AFFINITY_HEADER, SESSION_AFFINITY_HEADER_VALUE);
+                ApplicationRequestRouting.DisableInstanceAffinity(responseOut);
                 return;
             }
             catch (RedirectException e)
             {
                 responseOut.StatusCode = (int) e.StatusCode;
                 responseOut.Headers.Add(LOCATION_HEADER, e.Location);
-                // Remove Azure's session affinity cookie
-                responseOut.Headers.Add(SESSION_AFFINITY_HEADER, SESSION_AFFINITY_HEADER_VALUE);
+                ApplicationRequestRouting.DisableInstanceAffinity(responseOut);
                 return;
             }
 
@@ -154,8 +149,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
                     // Note: this could flood the logs due to spiders...
                     this.log.Info("Request method not supported", () => new {method});
                     responseOut.StatusCode = (int) HttpStatusCode.NotImplemented;
-                    // Remove Azure's session affinity cookie
-                    responseOut.Headers.Add(SESSION_AFFINITY_HEADER, SESSION_AFFINITY_HEADER_VALUE);
+                    ApplicationRequestRouting.DisableInstanceAffinity(responseOut);
                     return;
             }
 
@@ -205,7 +199,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
             // Allow error codes without throwing an exception
             requestOut.Options.EnsureSuccess = false;
 
-            // TODO: verify the remote identity
+            // The HTTP client uses cert. pinning, allowing self-signed certs
             requestOut.Options.AllowInsecureSslServer = true;
 
             return requestOut;
@@ -247,8 +241,8 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
                 responseOut.Headers.Add(HSTS_HEADER, "max-age=" + this.config.StrictTransportSecurityPeriod);
             }
 
-            // Remove Azure's session affinity cookie
-            responseOut.Headers.Add(SESSION_AFFINITY_HEADER, SESSION_AFFINITY_HEADER_VALUE);
+            // Last header before writing to the socket
+            ApplicationRequestRouting.DisableInstanceAffinity(responseOut);
 
             // Some status codes like 204 and 304 can't have a body
             if (response.CanHaveBody && !string.IsNullOrEmpty(response.Content))

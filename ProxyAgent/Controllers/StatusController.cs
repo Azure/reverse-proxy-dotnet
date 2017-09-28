@@ -47,8 +47,9 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.Controllers
                 };
             }
 
-            // See https://azure.microsoft.com/en-us/blog/disabling-arrs-instance-affinity-in-windows-azure-web-sites/
-            this.Response.Headers.Add(Proxy.SESSION_AFFINITY_HEADER, Proxy.SESSION_AFFINITY_HEADER_VALUE);
+            // Disable IIS Application Request Routing (remove cookie)
+            // See https://azure.microsoft.com/blog/disabling-arrs-instance-affinity-in-windows-azure-web-sites
+            ApplicationRequestRouting.DisableInstanceAffinity(this.Response);
 
             return new Dictionary<string, string>
             {
