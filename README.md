@@ -46,12 +46,21 @@ for more information.
 
 ## Configuration
 
-The service has one mandatory value for the remote endpoint, and some optional
+The service has two mandatory values for the remote endpoint, and some optional
 settings with a default value, that can be overridden if required:
+
+Mandatory configuration settings:
 
 * `endpoint`: this is the full URL of the remote endpoint where all requests
   are routed to.
   Environment variable: `REMOTE_ENDPOINT`.
+* `ssl_cert_thumbprint`: the thumbprint of the SSL certificate used by the remote
+  endpoint. This allows to use self-signed certificates, with fine-grained control
+  on the exact certificate used by the remote server.
+  Environment variable: `REMOTE_ENDPOINT_SSL_THUMBPRINT`.
+  
+Optional settings:
+
 * `redirectHttpToHttps`: optional value to decide whether HTTP requests should
   be redirected to HTTPS (default: true).
   Environment variable: `REDIRECT_HTTP_TO_HTTPS`.
