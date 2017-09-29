@@ -81,5 +81,5 @@ Optional settings:
 [build-url]: https://travis-ci.org/Azure/reverse-proxy-dotnet
 [issues-badge]: https://img.shields.io/github/issues/azure/reverse-proxy-dotnet.svg
 [issues-url]: https://github.com/azure/reverse-proxy-dotnet/issues
-[gitter-badge]: https://img.shields.io/gitter/room/azure/iot-pcs.js.svg
-[gitter-url]: https://gitter.im/azure/iot-pcs
+[gitter-badge]: https://img.shields.io/gitter/room/azure/iot-solutions.js.svg
+[gitter-url]: https://gitter.im/azure/iot-solutions
