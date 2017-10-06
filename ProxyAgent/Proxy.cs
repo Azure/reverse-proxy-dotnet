@@ -1,8 +1,8 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
-using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -52,6 +52,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
                 "server",
                 "transfer-encoding",
                 "upgrade",
+                "x-powered-by",
                 HSTS_HEADER
             };
 
@@ -114,7 +115,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
             catch (RedirectException e)
             {
                 responseOut.StatusCode = (int) e.StatusCode;
-                responseOut.Headers.Add(LOCATION_HEADER, e.Location);
+                responseOut.Headers[LOCATION_HEADER] = e.Location;
                 ApplicationRequestRouting.DisableInstanceAffinity(responseOut);
                 return;
             }
@@ -226,7 +227,14 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
                     this.log.Debug("Adding response header", () => new {header.Key, header.Value});
                     foreach (var value in header.Value)
                     {
-                        responseOut.Headers.Add(header.Key, value);
+                        if (responseOut.Headers.ContainsKey(header.Key))
+                        {
+                            responseOut.Headers[header.Key].Append(value);
+                        }
+                        else
+                        {
+                            responseOut.Headers.Add(header.Key, value);
+                        }
                     }
                 }
             }
@@ -238,7 +246,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
             // connections and inject the header or remove it.
             if (requestIn.IsHttps && this.config.StrictTransportSecurityEnabled)
             {
-                responseOut.Headers.Add(HSTS_HEADER, "max-age=" + this.config.StrictTransportSecurityPeriod);
+                responseOut.Headers[HSTS_HEADER] = "max-age=" + this.config.StrictTransportSecurityPeriod;
             }
 
             // Last header before writing to the socket
