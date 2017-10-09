@@ -1,8 +1,8 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
-using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -10,6 +10,7 @@ using Microsoft.Azure.IoTSolutions.ReverseProxy.Diagnostics;
 using Microsoft.Azure.IoTSolutions.ReverseProxy.Exceptions;
 using Microsoft.Azure.IoTSolutions.ReverseProxy.HttpClient;
 using Microsoft.Azure.IoTSolutions.ReverseProxy.Runtime;
+using Microsoft.Extensions.Primitives;
 using HttpRequest = Microsoft.AspNetCore.Http.HttpRequest;
 using HttpResponse = Microsoft.AspNetCore.Http.HttpResponse;
 
@@ -20,7 +21,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
         Task<ProxyStatus> PingAsync();
 
         Task ProcessAsync(
-            string hostname,
+            string remoteEndpoint,
             HttpRequest requestIn,
             HttpResponse responseOut);
     }
@@ -52,7 +53,8 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
                 "server",
                 "transfer-encoding",
                 "upgrade",
-                HSTS_HEADER
+                "x-powered-by",
+                HSTS_HEADER.ToLowerInvariant()
             };
 
         private readonly IHttpClient client;
@@ -82,7 +84,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
             request.Options.AllowInsecureSslServer = true;
 
             var response = await this.client.GetAsync(request);
-            var content = response.Content.Length > 120
+            var content = response.Content?.Length > 120
                 ? response.Content.Substring(0, 120) + "..."
                 : response.Content;
 
@@ -94,16 +96,16 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
         }
 
         public async Task ProcessAsync(
-            string hostname,
+            string remoteEndpoint,
             HttpRequest requestIn,
             HttpResponse responseOut)
         {
             IHttpRequest request;
-        
+
             try
             {
                 this.RedirectToHttpsIfNeeded(requestIn);
-                request = this.BuildRequest(requestIn, hostname);
+                request = this.BuildRequest(requestIn, remoteEndpoint);
             }
             catch (RequestPayloadTooLargeException)
             {
@@ -114,14 +116,14 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
             catch (RedirectException e)
             {
                 responseOut.StatusCode = (int) e.StatusCode;
-                responseOut.Headers.Add(LOCATION_HEADER, e.Location);
+                responseOut.Headers[LOCATION_HEADER] = e.Location;
                 ApplicationRequestRouting.DisableInstanceAffinity(responseOut);
                 return;
             }
 
             IHttpResponse response;
             var method = requestIn.Method.ToUpperInvariant();
-            this.log.Debug("Request method", () => new {method});
+            this.log.Debug("Request method", () => new { method });
             switch (method)
             {
                 case "GET":
@@ -147,7 +149,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
                     break;
                 default:
                     // Note: this could flood the logs due to spiders...
-                    this.log.Info("Request method not supported", () => new {method});
+                    this.log.Info("Request method not supported", () => new { method });
                     responseOut.StatusCode = (int) HttpStatusCode.NotImplemented;
                     ApplicationRequestRouting.DisableInstanceAffinity(responseOut);
                     return;
@@ -174,11 +176,11 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
             {
                 if (ExcludedRequestHeaders.Contains(header.Key.ToLowerInvariant()))
                 {
-                    this.log.Debug("Ignoring request header", () => new {header.Key, header.Value});
+                    this.log.Debug("Ignoring request header", () => new { header.Key, header.Value });
                     continue;
                 }
 
-                this.log.Debug("Adding request header", () => new {header.Key, header.Value});
+                this.log.Debug("Adding request header", () => new { header.Key, header.Value });
                 foreach (var value in header.Value)
                 {
                     requestOut.AddHeader(header.Key, value);
@@ -186,7 +188,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
             }
 
             var url = toHostname + requestIn.Path.Value + requestIn.QueryString;
-            this.log.Debug("URL", () => new {url});
+            this.log.Debug("URL", () => new { url });
             requestOut.SetUriFromString(url);
 
             // Forward request payload
@@ -208,7 +210,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
         private async Task BuildResponseAsync(IHttpResponse response, HttpResponse responseOut, HttpRequest requestIn)
         {
             // Forward the HTTP status code
-            this.log.Debug("Status code", () => new {response.StatusCode});
+            this.log.Debug("Status code", () => new { response.StatusCode });
             responseOut.StatusCode = (int) response.StatusCode;
 
             // The Headers property can be null in case of errors
@@ -219,14 +221,25 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
                 {
                     if (ExcludedResponseHeaders.Contains(header.Key.ToLowerInvariant()))
                     {
-                        this.log.Debug("Ignoring response header", () => new {header.Key, header.Value});
+                        this.log.Debug("Ignoring response header", () => new { header.Key, header.Value });
                         continue;
                     }
 
-                    this.log.Debug("Adding response header", () => new {header.Key, header.Value});
+                    this.log.Debug("Adding response header", () => new { header.Key, header.Value });
                     foreach (var value in header.Value)
                     {
-                        responseOut.Headers.Add(header.Key, value);
+                        if (!responseOut.Headers.ContainsKey(header.Key))
+                        {
+                            responseOut.Headers[header.Key] = value;
+                        }
+                        else
+                        {
+                            // `.Append()` doesn't work on responseOut.Headers, this is
+                            // a workaround to support multiple instances of the same header
+                            var headers = responseOut.Headers[header.Key].ToList();
+                            headers.Add(value);
+                            responseOut.Headers[header.Key] = new StringValues(headers.ToArray());
+                        }
                     }
                 }
             }
@@ -238,7 +251,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
             // connections and inject the header or remove it.
             if (requestIn.IsHttps && this.config.StrictTransportSecurityEnabled)
             {
-                responseOut.Headers.Add(HSTS_HEADER, "max-age=" + this.config.StrictTransportSecurityPeriod);
+                responseOut.Headers[HSTS_HEADER] = "max-age=" + this.config.StrictTransportSecurityPeriod;
             }
 
             // Last header before writing to the socket
@@ -265,7 +278,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
                 //       use Kestrel options in .NET Core 2.0 to limit the payload size 
                 if (text.Length > this.config.MaxPayloadSize)
                 {
-                    this.log.Warn("User request payloaad is too large", () => new {text.Length});
+                    this.log.Warn("User request payloaad is too large", () => new { text.Length });
                     throw new RequestPayloadTooLargeException();
                 }
             }

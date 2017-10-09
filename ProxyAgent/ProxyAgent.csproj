@@ -3,6 +3,7 @@
     <TargetFramework>netcoreapp1.1</TargetFramework>
     <AssemblyName>Microsoft.Azure.IoTSolutions.ReverseProxy</AssemblyName>
     <RootNamespace>Microsoft.Azure.IoTSolutions.ReverseProxy</RootNamespace>
+    <LangVersion>7</LangVersion>
   </PropertyGroup>
   <PropertyGroup>
     <PackageTargetFallback>$(PackageTargetFallback);portable-net45+win8+wp8+wpa81;</PackageTargetFallback>
@@ -24,6 +25,11 @@
     <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="1.1.2" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Ini" Version="1.1.2" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="1.1.2" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Update="web.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <None Update="appsettings.ini">

@@ -32,6 +32,11 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.HttpClient
             }
         }
 
+        public bool Contains(string name)
+        {
+            return this.data.ContainsKey(name);
+        }
+
         public IEnumerator<KeyValuePair<string, List<string>>> GetEnumerator()
         {
             return ((IEnumerable<KeyValuePair<string, List<string>>>) this.data).GetEnumerator();

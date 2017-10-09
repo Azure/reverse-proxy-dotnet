@@ -94,7 +94,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.HttpClient
                 // -> "Content-Type: application/json, application/json"
                 var headersOnContentObject = new HashSet<string>();
 
-                SetServerSslSecurity(request, clientHandler);
+                this.SetServerSslSecurity(request, clientHandler);
                 SetTimeout(request, client);
                 // Note: SetContent must be called before SetHeaders to prioritize the 
                 // Content Type value set in the content.
@@ -232,7 +232,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.HttpClient
                 clientHandler.ServerCertificateCustomValidationCallback += delegate(HttpRequestMessage sender, X509Certificate2 cert, X509Chain chain, SslPolicyErrors error)
                 {
                     var sslThumbprint = cert.Thumbprint.ToLowerInvariant();
-                    var configThumbprint = this.config.SSLCertThumbprint.ToLowerInvariant();
+                    var configThumbprint = this.config.SslCertThumbprint.ToLowerInvariant();
                     if (sslThumbprint  != configThumbprint)
                     {
                         this.log.Error("The remote endpoint is using an unknown/invalid SSL certificate, " +
