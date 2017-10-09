@@ -3,6 +3,7 @@
     <TargetFramework>netcoreapp1.1</TargetFramework>
     <AssemblyName>Microsoft.Azure.IoTSolutions.ReverseProxy</AssemblyName>
     <RootNamespace>Microsoft.Azure.IoTSolutions.ReverseProxy</RootNamespace>
+    <LangVersion>7</LangVersion>
   </PropertyGroup>
   <PropertyGroup>
     <PackageTargetFallback>$(PackageTargetFallback);portable-net45+win8+wp8+wpa81;</PackageTargetFallback>
