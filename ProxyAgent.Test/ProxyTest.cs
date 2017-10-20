@@ -99,6 +99,7 @@ namespace ProxyAgent.Test
             request.Headers["Host"] = "something";
             request.Headers["Upgrade"] = "something";
             request.Headers["Upgrade-Insecure-Requests"] = "something";
+
             // Arrange - Some legit request headers
             request.Headers["Content-Type"] = "one";
             request.Headers["Cookie"] = "two";
@@ -111,15 +112,16 @@ namespace ProxyAgent.Test
             var clientResponseHeaders = new HttpHeaders
             {
                 { "Connection", "something" },
-                { "Content-Length", "something" },
                 { "Server", "something" },
                 { "Transfer-Encoding", "something" },
                 { "Upgrade", "something" },
                 { "X-Powered-By", "something" },
                 { "Strict-Transport-Security", "something" },
             };
+
             // Arrange - Some legit response headers
             clientResponseHeaders.Add("Content-Type", "one");
+            clientResponseHeaders.Add("Content-Length", "55555");
             clientResponseHeaders.Add("Set-Cookie", "two");
             clientResponseHeaders.Add("X-ActivityId", "three");
             clientResponseHeaders.Add("X-CorrelationId", "four");
@@ -128,11 +130,13 @@ namespace ProxyAgent.Test
             // Act
             this.target.ProcessAsync("https://" + request.Host, request, response).Wait(TestTimeout);
 
-            // Assert - requests headers are blocked/passed as expected
+            // Assert - these request headers are allowed
             this.client.Verify(x => x.GetAsync(It.Is<IHttpRequest>(r => r.Headers.Contains("Content-Type"))), Times.Once);
             this.client.Verify(x => x.GetAsync(It.Is<IHttpRequest>(r => r.Headers.Contains("Cookie"))), Times.Once);
             this.client.Verify(x => x.GetAsync(It.Is<IHttpRequest>(r => r.Headers.Contains("X-ActivityId"))), Times.Once);
             this.client.Verify(x => x.GetAsync(It.Is<IHttpRequest>(r => r.Headers.Contains("X-CorrelationId"))), Times.Once);
+
+            // Assert - these request headers are blocked
             this.client.Verify(x => x.GetAsync(It.Is<IHttpRequest>(r => !r.Headers.Contains("Connection"))), Times.Once);
             this.client.Verify(x => x.GetAsync(It.Is<IHttpRequest>(r => !r.Headers.Contains("Content-Length"))), Times.Once);
             this.client.Verify(x => x.GetAsync(It.Is<IHttpRequest>(r => !r.Headers.Contains("Keep-Alive"))), Times.Once);
@@ -140,18 +144,20 @@ namespace ProxyAgent.Test
             this.client.Verify(x => x.GetAsync(It.Is<IHttpRequest>(r => !r.Headers.Contains("Upgrade"))), Times.Once);
             this.client.Verify(x => x.GetAsync(It.Is<IHttpRequest>(r => !r.Headers.Contains("Upgrade-Insecure-Requests"))), Times.Once);
 
-            // Assert - response headers are blocked/passed as expected
-            Assert.Equal(response.Headers["Content-Type"].First(), "one");
-            Assert.Equal(response.Headers["Set-Cookie"].First(), "two");
-            Assert.Equal(response.Headers["X-ActivityId"].First(), "three");
-            Assert.Equal(response.Headers["X-CorrelationId"].First(), "four");
+            // Assert - these response headers are allowed
+            Assert.Equal("one", response.Headers["Content-Type"].First());
+            Assert.Equal("55555", response.Headers["Content-Length"].First());
+            Assert.Equal("two", response.Headers["Set-Cookie"].First());
+            Assert.Equal("three", response.Headers["X-ActivityId"].First());
+            Assert.Equal("four", response.Headers["X-CorrelationId"].First());
+
+            // Assert - these response headers are blocked
             Assert.False(response.Headers.ContainsKey("Connection"));
-            Assert.False(response.Headers.ContainsKey("Content-Length"));
             Assert.False(response.Headers.ContainsKey("Server"));
+            Assert.False(response.Headers.ContainsKey("Strict-Transport-Security"));
             Assert.False(response.Headers.ContainsKey("Transfer-Encoding"));
             Assert.False(response.Headers.ContainsKey("Upgrade"));
             Assert.False(response.Headers.ContainsKey("X-Powered-By"));
-            Assert.False(response.Headers.ContainsKey("Strict-Transport-Security"));
         }
 
         /**

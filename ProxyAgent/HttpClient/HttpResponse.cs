@@ -8,7 +8,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.HttpClient
     {
         HttpStatusCode StatusCode { get; }
         HttpHeaders Headers { get; }
-        string Content { get; }
+        byte[] Content { get; }
 
         bool IsSuccess { get; }
         bool IsError { get; }
@@ -36,7 +36,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.HttpClient
 
         public HttpResponse(
             HttpStatusCode statusCode,
-            string content,
+            byte[] content,
             HttpHeaders headers)
         {
             this.StatusCode = statusCode;
@@ -46,7 +46,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.HttpClient
 
         public HttpStatusCode StatusCode { get; internal set; }
         public HttpHeaders Headers { get; internal set; }
-        public string Content { get; internal set; }
+        public byte[] Content { get; internal set; }
 
         public bool IsSuccess => (int) this.StatusCode >= 200 && (int) this.StatusCode <= 299;
         public bool IsError => (int) this.StatusCode >= 400 || (int) this.StatusCode == 0;

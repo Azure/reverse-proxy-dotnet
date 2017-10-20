@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Azure.IoTSolutions.ReverseProxy.Diagnostics;
 using Microsoft.Azure.IoTSolutions.ReverseProxy.Runtime;
@@ -96,7 +97,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.HttpClient
 
                 this.SetServerSslSecurity(request, clientHandler);
                 SetTimeout(request, client);
-                // Note: SetContent must be called before SetHeaders to prioritize the 
+                // Note: SetContent must be called before SetHeaders to prioritize the
                 // Content Type value set in the content.
                 // TODO: ensure that's what happens with a unit test
                 this.SetContent(request, httpMethod, httpRequest, ref headersOnContentObject);
@@ -124,7 +125,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.HttpClient
                         {
                             StatusCode = response.StatusCode,
                             Headers = headers,
-                            Content = await response.Content.ReadAsStringAsync()
+                            Content = await response.Content.ReadAsByteArrayAsync()
                         };
                     }
                 }
@@ -141,7 +142,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.HttpClient
                     return new HttpResponse
                     {
                         StatusCode = HttpStatusCode.BadGateway,
-                        Content = errorMessage
+                        Content = Encoding.UTF8.GetBytes(errorMessage)
                     };
                 }
                 catch (PlatformNotSupportedException e)
@@ -155,7 +156,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.HttpClient
                     return new HttpResponse
                     {
                         StatusCode = 0,
-                        Content = e.Message
+                        Content = Encoding.UTF8.GetBytes(e.Message)
                     };
                 }
                 catch (TaskCanceledException e)
@@ -170,7 +171,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.HttpClient
                     return new HttpResponse
                     {
                         StatusCode = 0,
-                        Content = e.Message + " The endpoint might be unreachable."
+                        Content = Encoding.UTF8.GetBytes(e.Message + " The endpoint might be unreachable.")
                     };
                 }
                 catch (Exception e)
@@ -180,7 +181,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.HttpClient
                     return new HttpResponse
                     {
                         StatusCode = 0,
-                        Content = e.Message
+                        Content = Encoding.UTF8.GetBytes(e.Message)
                     };
                 }
             }
