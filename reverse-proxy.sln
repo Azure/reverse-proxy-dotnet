@@ -58,6 +58,13 @@ ProjectSection(SolutionItems) = preProject
 	docs\assets\css\style.scss = docs\assets\css\style.scss
 EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{41798324-16E8-4B59-AF55-822886825731}"
+ProjectSection(SolutionItems) = preProject
+	.github\ISSUE_TEMPLATE.md = .github\ISSUE_TEMPLATE.md
+	.github\PULL_REQUEST_TEMPLATE.md = .github\PULL_REQUEST_TEMPLATE.md
+	.github\CODEOWNERS = .github\CODEOWNERS
+EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -83,5 +90,6 @@ Global
 		{45D1F48D-0C68-40CF-83D5-E215420BA6D4} = {CE9EA71C-C6AA-41A5-821C-F18CB599A818}
 		{A1C922C7-4CD8-4216-B487-34BA5E1055D6} = {CE9EA71C-C6AA-41A5-821C-F18CB599A818}
 		{73683480-441E-4F01-8AC2-5FB74F648CF6} = {A1C922C7-4CD8-4216-B487-34BA5E1055D6}
+		{41798324-16E8-4B59-AF55-822886825731} = {A7874FC8-DB34-4EB0-9EDC-7818B3DF289D}
 	EndGlobalSection
 EndGlobal

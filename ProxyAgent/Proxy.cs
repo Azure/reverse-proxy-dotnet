@@ -4,8 +4,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Text;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.IoTSolutions.ReverseProxy.Diagnostics;
 using Microsoft.Azure.IoTSolutions.ReverseProxy.Exceptions;
 using Microsoft.Azure.IoTSolutions.ReverseProxy.HttpClient;
@@ -49,7 +49,6 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
             new HashSet<string>
             {
                 "connection",
-                "content-length",
                 "server",
                 "transfer-encoding",
                 "upgrade",
@@ -84,9 +83,13 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
             request.Options.AllowInsecureSslServer = true;
 
             var response = await this.client.GetAsync(request);
-            var content = response.Content?.Length > 120
-                ? response.Content.Substring(0, 120) + "..."
-                : response.Content;
+
+            var body = response.Content == null
+                ? string.Empty
+                : Encoding.UTF8.GetString(response.Content);
+            var content = body.Length > 120
+                ? body.Substring(0, 120) + "..."
+                : body;
 
             return new ProxyStatus
             {
@@ -258,9 +261,9 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
             ApplicationRequestRouting.DisableInstanceAffinity(responseOut);
 
             // Some status codes like 204 and 304 can't have a body
-            if (response.CanHaveBody && !string.IsNullOrEmpty(response.Content))
+            if (response.CanHaveBody && response.Content.Length > 0)
             {
-                await responseOut.WriteAsync(response.Content);
+                await responseOut.Body.WriteAsync(response.Content, 0, response.Content.Length);
             }
         }
 
@@ -275,7 +278,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
                 text = reader.ReadToEnd();
 
                 // TODO: throw the error before loading the entire payload in memory
-                //       use Kestrel options in .NET Core 2.0 to limit the payload size 
+                //       use Kestrel options in .NET Core 2.0 to limit the payload size
                 if (text.Length > this.config.MaxPayloadSize)
                 {
                     this.log.Warn("User request payloaad is too large", () => new { text.Length });

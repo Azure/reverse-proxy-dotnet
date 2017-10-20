@@ -1,6 +1,5 @@
-#!/usr/bin/env bash
+#!/usr/bin/env bash -e
 
-set -e
 APP_HOME="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && cd .. && pwd )/"
 source "$APP_HOME/scripts/git/.functions.sh"
 
