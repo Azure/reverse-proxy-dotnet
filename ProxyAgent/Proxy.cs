@@ -30,6 +30,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
     {
         private const string LOCATION_HEADER = "Location";
         private const string HSTS_HEADER = "Strict-Transport-Security";
+        private const string IMAGE = "image";
 
         // Headers not forwarded to the remote endpoint
         private static readonly HashSet<string> ExcludedRequestHeaders =
@@ -198,7 +199,14 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
             var method = requestIn.Method.ToUpperInvariant();
             if (HttpClient.HttpClient.MethodsWithPayload.Contains(method))
             {
-                requestOut.SetContent(this.GetRequestPayload(requestIn));
+                if (requestIn.ContentType.ToLowerInvariant().StartsWith(IMAGE))
+                {
+                    requestOut.SetContent(this.GetByteRequestPayload(requestIn), requestIn.ContentType);
+                }
+                else
+                {
+                    requestOut.SetContent(this.GetRequestPayload(requestIn));
+                }
             }
 
             // Allow error codes without throwing an exception
@@ -281,12 +289,19 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
                 //       use Kestrel options in .NET Core 2.0 to limit the payload size
                 if (text.Length > this.config.MaxPayloadSize)
                 {
-                    this.log.Warn("User request payloaad is too large", () => new { text.Length });
+                    this.log.Warn("User request payload is too large", () => new { text.Length });
                     throw new RequestPayloadTooLargeException();
                 }
             }
 
             return text;
+        }
+
+        private byte[] GetByteRequestPayload(HttpRequest request)
+        {
+            var memstream = new MemoryStream();
+            request.Body.CopyTo(memstream);
+            return memstream.ToArray();
         }
     }
 }
