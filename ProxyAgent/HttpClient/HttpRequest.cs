@@ -153,7 +153,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.HttpClient
         public IHttpRequest SetContent(byte[] content, string mediaType)
         {
             this.requestContent.Content = new ByteArrayContent(content);
-            this.ContentType = new MediaTypeHeaderValue(mediaType);
+            this.ContentType = mediaType == null ? this.defaultMediaType : new MediaTypeHeaderValue(mediaType);
             return this;
         }
     }

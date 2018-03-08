@@ -30,7 +30,6 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
     {
         private const string LOCATION_HEADER = "Location";
         private const string HSTS_HEADER = "Strict-Transport-Security";
-        private const string IMAGE = "image";
 
         // Headers not forwarded to the remote endpoint
         private static readonly HashSet<string> ExcludedRequestHeaders =
@@ -199,14 +198,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
             var method = requestIn.Method.ToUpperInvariant();
             if (HttpClient.HttpClient.MethodsWithPayload.Contains(method))
             {
-                if (requestIn.ContentType.ToLowerInvariant().StartsWith(IMAGE))
-                {
-                    requestOut.SetContent(this.GetByteRequestPayload(requestIn), requestIn.ContentType);
-                }
-                else
-                {
-                    requestOut.SetContent(this.GetRequestPayload(requestIn));
-                }
+                requestOut.SetContent(this.GetRequestPayload(requestIn), requestIn.ContentType);
             }
 
             // Allow error codes without throwing an exception
@@ -274,34 +266,14 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
                 await responseOut.Body.WriteAsync(response.Content, 0, response.Content.Length);
             }
         }
-
-        private string GetRequestPayload(HttpRequest request)
+        
+        private byte[] GetRequestPayload(HttpRequest request)
         {
-            string text;
-            var memstream = new MemoryStream();
-            request.Body.CopyTo(memstream);
-            memstream.Position = 0;
-            using (var reader = new StreamReader(memstream))
+            using (var memstream = new MemoryStream())
             {
-                text = reader.ReadToEnd();
-
-                // TODO: throw the error before loading the entire payload in memory
-                //       use Kestrel options in .NET Core 2.0 to limit the payload size
-                if (text.Length > this.config.MaxPayloadSize)
-                {
-                    this.log.Warn("User request payload is too large", () => new { text.Length });
-                    throw new RequestPayloadTooLargeException();
-                }
+                request.Body.CopyTo(memstream);
+                return memstream.ToArray();
             }
-
-            return text;
-        }
-
-        private byte[] GetByteRequestPayload(HttpRequest request)
-        {
-            var memstream = new MemoryStream();
-            request.Body.CopyTo(memstream);
-            return memstream.ToArray();
         }
     }
 }
