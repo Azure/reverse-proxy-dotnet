@@ -43,6 +43,8 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.HttpClient
         IHttpRequest SetContent<T>(T sourceObject, Encoding encoding, string mediaType);
 
         IHttpRequest SetContent<T>(T sourceObject, Encoding encoding, MediaTypeHeaderValue mediaType);
+
+        IHttpRequest SetContent(byte[] content, string mediaType);
     }
 
     public class HttpRequest : IHttpRequest
