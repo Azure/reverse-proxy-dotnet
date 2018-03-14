@@ -13,9 +13,8 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
                 .UseKestrel(options =>
                 {
                     options.AddServerHeader = false;
-                    // The default setting is ProcessorCount/2
-                    options.ThreadCount = System.Environment.ProcessorCount;
                 })
+                .UseLibuv(options => options.ThreadCount = System.Environment.ProcessorCount)
                 .UseContentRoot(Directory.GetCurrentDirectory())
                 .UseIISIntegration()
                 .UseStartup<Startup>()
