@@ -18,8 +18,8 @@ check_dependency_dotnet() {
     TEST=$(which dotnet)
     if [[ -z "$TEST" ]]; then
         echo "ERROR: 'dotnet' command not found."
-        echo "Install .NET Core and make sure the 'dotnet' command is in the PATH."
-        echo ".NET Core installation: https://dotnet.github.io"
+        echo "Install .NET Core 2 and make sure the 'dotnet' command is in the PATH."
+        echo ".NET Core 2 installation: https://dotnet.github.io"
         exit 1
     fi
     set -e
