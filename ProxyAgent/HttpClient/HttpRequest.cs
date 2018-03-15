@@ -43,6 +43,8 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.HttpClient
         IHttpRequest SetContent<T>(T sourceObject, Encoding encoding, string mediaType);
 
         IHttpRequest SetContent<T>(T sourceObject, Encoding encoding, MediaTypeHeaderValue mediaType);
+
+        IHttpRequest SetContent(byte[] content, string mediaType);
     }
 
     public class HttpRequest : IHttpRequest
@@ -145,6 +147,13 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.HttpClient
             var content = JsonConvert.SerializeObject(sourceObject, Formatting.None);
             this.requestContent.Content = new StringContent(content, encoding, mediaType.MediaType);
             this.ContentType = mediaType;
+            return this;
+        }
+
+        public IHttpRequest SetContent(byte[] content, string mediaType)
+        {
+            this.requestContent.Content = new ByteArrayContent(content);
+            this.ContentType = mediaType == null ? this.defaultMediaType : new MediaTypeHeaderValue(mediaType);
             return this;
         }
     }
