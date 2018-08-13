@@ -147,13 +147,22 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.HttpClient
             var content = JsonConvert.SerializeObject(sourceObject, Formatting.None);
             this.requestContent.Content = new StringContent(content, encoding, mediaType.MediaType);
             this.ContentType = mediaType;
+
             return this;
         }
 
         public IHttpRequest SetContent(byte[] content, string mediaType)
         {
+            if (mediaType != null && mediaType.StartsWith("multipart/form"))
+            {
+                this.requestContent.Headers.Add("ContentType", mediaType);
+            }
+            else
+            {
+                this.ContentType = mediaType == null ? this.defaultMediaType : new MediaTypeHeaderValue(mediaType);
+            }
+
             this.requestContent.Content = new ByteArrayContent(content);
-            this.ContentType = mediaType == null ? this.defaultMediaType : new MediaTypeHeaderValue(mediaType);
             return this;
         }
     }

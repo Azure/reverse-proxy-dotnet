@@ -218,6 +218,32 @@ namespace ProxyAgent.Test
             Assert.True(response.Headers["X-Foo"].Contains("three"));
         }
 
+        /**
+         * Bugfix test
+         *
+         * "Proxy doesn't support multipart form data request type"
+         */
+        [Fact, Trait(Constants.TYPE, Constants.UNIT_TEST)]
+        public void ItSupportsMultipartFormDataContentTypeHeaders()
+        {
+            // Arrange - Request with duplicate headers
+            var (request, response) = PrepareContext();
+            request.Headers.Add("Content-Type", "multipart/form-data;boundary====test");
+            request.Method = "POST";
+
+            // Arrange - Remote endpoint response
+            var statusCode = HttpStatusCode.MultipleChoices;
+            var clientResponse = new Mock<IHttpResponse>();
+            clientResponse.SetupGet(x => x.StatusCode).Returns(statusCode);
+            this.client.Setup(x => x.PostAsync(It.IsAny<IHttpRequest>())).ReturnsAsync(clientResponse.Object);
+
+            // Act
+            this.target.ProcessAsync("https://" + request.Host, request, response).Wait(TestTimeout);
+
+            // Assert - the request ran, without exceptions
+            this.client.Verify(x => x.PostAsync(It.IsAny<IHttpRequest>()), Times.Once);
+        }
+
         // Prepare HTTP context similarly to what ASP.NET does, as far as tests are concerned
         private static (HttpRequest, HttpResponse) PrepareContext(
             string host = "",
