@@ -153,7 +153,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.HttpClient
 
         public IHttpRequest SetContent(byte[] content, string mediaType)
         {
-            if (mediaType != null && mediaType.StartsWith("multipart/form"))
+            if (mediaType != null && mediaType.StartsWith("multipart/form-data"))
             {
                 this.requestContent.Headers.Add("ContentType", mediaType);
             }
