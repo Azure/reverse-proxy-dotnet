@@ -152,8 +152,27 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.HttpClient
 
         public IHttpRequest SetContent(byte[] content, string mediaType)
         {
-            this.requestContent.Content = new ByteArrayContent(content);
-            this.ContentType = mediaType == null ? this.defaultMediaType : new MediaTypeHeaderValue(mediaType);
+            var byteArrayContent = new ByteArrayContent(content);
+
+            if (mediaType.Contains("boundary") && mediaType.Contains("multipart/form-data"))
+            {
+                // Trying to construct MultipartFormDataContent and set it as Content
+
+                string boundary = mediaType.Split("=")[1];
+                MultipartFormDataContent formDataContent = new MultipartFormDataContent(boundary);
+                formDataContent.Add(byteArrayContent, "file"); // Missing filename here could be: formDataContent.Add(byteArrayContent, "file", "filename.js")
+
+                this.requestContent.Content = formDataContent;
+                //this.Headers.Add("Content-Type", mediaType);
+
+                this.requestContent.Content.Headers.Remove("Content-Type");
+                this.requestContent.Content.Headers.TryAddWithoutValidation("Content-Type", "multipart/form-data; boundary=" + boundary);
+                //this.ContentType = new MediaTypeHeaderValue("multipart/form-data");
+            } else
+            {
+                this.requestContent.Content = byteArrayContent;
+                this.ContentType = mediaType == null ? this.defaultMediaType : new MediaTypeHeaderValue(mediaType);
+            }
             return this;
         }
     }

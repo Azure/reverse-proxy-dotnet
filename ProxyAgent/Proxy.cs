@@ -1,11 +1,16 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http.Internal;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Azure.IoTSolutions.ReverseProxy.Diagnostics;
 using Microsoft.Azure.IoTSolutions.ReverseProxy.Exceptions;
 using Microsoft.Azure.IoTSolutions.ReverseProxy.HttpClient;
@@ -172,6 +177,11 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
         // Prepare the request to send to the remote endpoint
         private IHttpRequest BuildRequest(HttpRequest requestIn, string toHostname)
         {
+            if (requestIn.ContentType.Contains("multipart/form-data"))
+            {
+                // return new HttpClient.HttpRequest();
+            }
+
             var requestOut = new HttpClient.HttpRequest();
 
             // Forward HTTP request headers
@@ -198,7 +208,11 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
             var method = requestIn.Method.ToUpperInvariant();
             if (HttpClient.HttpClient.MethodsWithPayload.Contains(method))
             {
-                requestOut.SetContent(this.GetRequestPayload(requestIn), requestIn.ContentType);
+                var task = this.ParseFiles(requestIn);
+                task.Wait(TimeSpan.FromSeconds(30));
+                var foooo = task.Result;
+                var payload = this.GetRequestPayload(requestIn);
+                requestOut.SetContent(payload, requestIn.ContentType);
             }
 
             // Allow error codes without throwing an exception
@@ -272,8 +286,43 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
             using (var memstream = new MemoryStream())
             {
                 request.Body.CopyTo(memstream);
-                return memstream.ToArray();
+                var foo = memstream.ToArray();
+
+                return foo;
+
             }
+            
+        }
+
+        private async Task<byte[]> ParseFiles(HttpRequest request)
+        {
+
+            string boundary = request.ContentType.Split("=")[1];
+            var reader = new MultipartReader(boundary, request.Body);
+            var section = await reader.ReadNextSectionAsync();
+            
+            // Trying to get the filename from http request
+            string value;
+            List<string> keyValuePairs = section.ContentDisposition.Split(";").ToList();
+
+            foreach (var keyValuePair in keyValuePairs)
+            {
+                string key = keyValuePair.Split('=')[0].Trim();
+                if (key == "filename")
+                {
+                    value = keyValuePair.Split('=')[1];
+                }
+            }
+
+            using (var memstream = new MemoryStream())
+            {
+                 await section.Body.CopyToAsync(memstream);
+                return memstream.ToArray();
+
+
+            }
+            
+
         }
     }
 }
