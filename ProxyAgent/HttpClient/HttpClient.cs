@@ -116,6 +116,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.HttpClient
                         {
                             headers.Add(header.Key, header.Value);
                         }
+
                         foreach (var header in response.Content.Headers)
                         {
                             headers.Add(header.Key, header.Value);
@@ -232,19 +233,17 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.HttpClient
             {
                 clientHandler.ServerCertificateCustomValidationCallback += delegate(HttpRequestMessage sender, X509Certificate2 cert, X509Chain chain, SslPolicyErrors error)
                 {
+                    if (cert.Thumbprint == null) return false;
+
                     var sslThumbprint = cert.Thumbprint.ToLowerInvariant();
                     var configThumbprint = this.config.SslCertThumbprint.ToLowerInvariant();
-                    if (sslThumbprint  != configThumbprint)
-                    {
-                        this.log.Error("The remote endpoint is using an unknown/invalid SSL certificate, " +
-                                       "the thumbprint of the certificate doesn't match the value in the configuration",
-                                        () => new { sslThumbprint, configThumbprint });
-                        return false;
-                    }
-                    else
-                    {
-                        return true;
-                    }
+                    if (sslThumbprint == configThumbprint) return true;
+
+                    this.log.Error("The remote endpoint is using an unknown/invalid SSL certificate, " +
+                                   "the thumbprint of the certificate doesn't match the value in the configuration",
+                        () => new { sslThumbprint, configThumbprint });
+
+                    return false;
                 };
             }
         }
