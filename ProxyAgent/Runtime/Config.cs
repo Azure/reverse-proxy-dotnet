@@ -35,6 +35,9 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.Runtime
 
         // Application logging level
         LogLevel LogLevel { get; }
+
+        // Whether to automatically follow the redirect given by the end point.
+        bool AutoRedirect { get; }
     }
 
     /// <summary>Web application configuration</summary>
@@ -49,6 +52,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.Runtime
         private const int MAX_PAYLOAD_SIZE_DEFAULT = 102400;
         private const bool STATUS_ENDPOINT_ENABLED_DEFAULT = false;
         private const LogLevel LOG_LEVEL_DEFAULT = LogLevel.Warn;
+        private const bool AUTO_REDIRECT_DEFAULT = true;
 
         private const string APPLICATION_KEY = "ReverseProxy:";
         private const string ENDPOINT_KEY = APPLICATION_KEY + "endpoint";
@@ -59,6 +63,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.Runtime
         private const string MAX_PAYLOAD_SIZE_KEY = APPLICATION_KEY + "maxPayloadSize";
         private const string STATUS_ENDPOINT_ENABLED_KEY = APPLICATION_KEY + "statusEndpointEnabled";
         private const string LOG_LEVEL_KEY = APPLICATION_KEY + "loglevel";
+        private const string AUTO_REDIRECT_KEY = APPLICATION_KEY + "autoRedirect";
 
         public string Endpoint { get; }
         public string SslCertThumbprint { get; }
@@ -68,6 +73,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.Runtime
         public int MaxPayloadSize { get; }
         public bool StatusEndpointEnabled { get; }
         public LogLevel LogLevel { get; }
+        public bool AutoRedirect { get; }
 
         public Config(IConfigData configData)
         {
@@ -87,6 +93,8 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.Runtime
             {
                 throw new InvalidConfigurationException("The remote endpoint hostname is empty.");
             }
+
+            this.AutoRedirect = configData.GetBool(AUTO_REDIRECT_KEY, AUTO_REDIRECT_DEFAULT);
         }
     }
 }

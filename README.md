@@ -76,6 +76,8 @@ Optional settings:
   Environment variable: `MAX_PAYLOAD_SIZE`.
 * `loglevel`: application logging level (default: Warn).
   Environment variable: `LOG_LEVEL`.
+* `autoRedirect`: whether to automatically follow a redirect (default: true).
+  Environment variable: `AUTO_REDIRECT`.
 
 [build-badge]: https://img.shields.io/travis/Azure/reverse-proxy-dotnet.svg
 [build-url]: https://travis-ci.org/Azure/reverse-proxy-dotnet
