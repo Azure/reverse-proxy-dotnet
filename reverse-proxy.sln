@@ -3,67 +3,69 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26430.14
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProxyAgent", "ProxyAgent\ProxyAgent.csproj", "{502EBAFE-91F7-4E0D-9905-A0E4B4BBA3FF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProxyAgent", "ProxyAgent\ProxyAgent.csproj", "{502EBAFE-91F7-4E0D-9905-A0E4B4BBA3FF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProxyAgent.Test", "ProxyAgent.Test\ProxyAgent.Test.csproj", "{01A9627B-486B-4641-82B0-909CBDD63EB2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProxyAgent.Test", "ProxyAgent.Test\ProxyAgent.Test.csproj", "{01A9627B-486B-4641-82B0-909CBDD63EB2}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "solution", "solution", "{A7874FC8-DB34-4EB0-9EDC-7818B3DF289D}"
-ProjectSection(SolutionItems) = preProject
-	.gitignore = .gitignore
-	.gitattributes = .gitattributes
-	CONTRIBUTING.md = CONTRIBUTING.md
-	LICENSE = LICENSE
-	README.md = README.md
-	reverse-proxy.sln.DotSettings = reverse-proxy.sln.DotSettings
-	version = version
-EndProjectSection
+	ProjectSection(SolutionItems) = preProject
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		CONTRIBUTING.md = CONTRIBUTING.md
+		LICENSE = LICENSE
+		README.md = README.md
+		reverse-proxy.sln.DotSettings = reverse-proxy.sln.DotSettings
+		version = version
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{B2E55E7C-7EDF-429A-BF44-69BD28CDA4E7}"
-ProjectSection(SolutionItems) = preProject
-	scripts\.functions.sh = scripts\.functions.sh
-	scripts\clean-up = scripts\clean-up
-	scripts\clean-up.cmd = scripts\clean-up.cmd
-	scripts\run = scripts\run
-	scripts\run.cmd = scripts\run.cmd
-	scripts\build = scripts\build
-	scripts\build.cmd = scripts\build.cmd
-EndProjectSection
+	ProjectSection(SolutionItems) = preProject
+		scripts\.functions.sh = scripts\.functions.sh
+		scripts\build = scripts\build
+		scripts\build.cmd = scripts\build.cmd
+		scripts\clean-up = scripts\clean-up
+		scripts\clean-up.cmd = scripts\clean-up.cmd
+		scripts\run = scripts\run
+		scripts\run.cmd = scripts\run.cmd
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "git", "git", "{B052137F-1F0D-4F87-B4F7-66F7B8E41D7E}"
-ProjectSection(SolutionItems) = preProject
-	scripts\git\fix-perms.sh = scripts\git\fix-perms.sh
-	scripts\git\pre-commit-runner-no-sandbox.sh = scripts\git\pre-commit-runner-no-sandbox.sh
-	scripts\git\pre-commit.sh = scripts\git\pre-commit.sh
-	scripts\git\setup = scripts\git\setup
-	scripts\git\setup.cmd = scripts\git\setup.cmd
-EndProjectSection
+	ProjectSection(SolutionItems) = preProject
+		scripts\git\fix-perms.sh = scripts\git\fix-perms.sh
+		scripts\git\pre-commit-runner-no-sandbox.sh = scripts\git\pre-commit-runner-no-sandbox.sh
+		scripts\git\pre-commit.sh = scripts\git\pre-commit.sh
+		scripts\git\setup = scripts\git\setup
+		scripts\git\setup.cmd = scripts\git\setup.cmd
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{CE9EA71C-C6AA-41A5-821C-F18CB599A818}"
-ProjectSection(SolutionItems) = preProject
-	docs\index.md = docs\index.md
-	docs\add-static-files.md = docs\add-static-files.md
-	docs\_config.yml = docs\_config.yml
-	docs\ssl-setup.md = docs\ssl-setup.md
-EndProjectSection
+	ProjectSection(SolutionItems) = preProject
+		docs\_config.yml = docs\_config.yml
+		docs\add-static-files.md = docs\add-static-files.md
+		docs\index.md = docs\index.md
+		docs\ssl-setup.md = docs\ssl-setup.md
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_layouts", "_layouts", "{45D1F48D-0C68-40CF-83D5-E215420BA6D4}"
-ProjectSection(SolutionItems) = preProject
-	docs\_layouts\default.html = docs\_layouts\default.html
-EndProjectSection
+	ProjectSection(SolutionItems) = preProject
+		docs\_layouts\default.html = docs\_layouts\default.html
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "assets", "assets", "{A1C922C7-4CD8-4216-B487-34BA5E1055D6}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "css", "css", "{73683480-441E-4F01-8AC2-5FB74F648CF6}"
-ProjectSection(SolutionItems) = preProject
-	docs\assets\css\style.scss = docs\assets\css\style.scss
-EndProjectSection
+	ProjectSection(SolutionItems) = preProject
+		docs\assets\css\style.scss = docs\assets\css\style.scss
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{41798324-16E8-4B59-AF55-822886825731}"
-ProjectSection(SolutionItems) = preProject
-	.github\ISSUE_TEMPLATE.md = .github\ISSUE_TEMPLATE.md
-	.github\PULL_REQUEST_TEMPLATE.md = .github\PULL_REQUEST_TEMPLATE.md
-	.github\CODEOWNERS = .github\CODEOWNERS
-EndProjectSection
+	ProjectSection(SolutionItems) = preProject
+		.github\CODEOWNERS = .github\CODEOWNERS
+		.github\ISSUE_TEMPLATE.md = .github\ISSUE_TEMPLATE.md
+		.github\PULL_REQUEST_TEMPLATE.md = .github\PULL_REQUEST_TEMPLATE.md
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Proxy", "Proxy\Proxy.csproj", "{34938BC8-5831-4786-A6D2-D70273BEE152}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -79,6 +81,10 @@ Global
 		{01A9627B-486B-4641-82B0-909CBDD63EB2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{01A9627B-486B-4641-82B0-909CBDD63EB2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{01A9627B-486B-4641-82B0-909CBDD63EB2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{34938BC8-5831-4786-A6D2-D70273BEE152}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{34938BC8-5831-4786-A6D2-D70273BEE152}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{34938BC8-5831-4786-A6D2-D70273BEE152}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{34938BC8-5831-4786-A6D2-D70273BEE152}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -91,5 +97,8 @@ Global
 		{A1C922C7-4CD8-4216-B487-34BA5E1055D6} = {CE9EA71C-C6AA-41A5-821C-F18CB599A818}
 		{73683480-441E-4F01-8AC2-5FB74F648CF6} = {A1C922C7-4CD8-4216-B487-34BA5E1055D6}
 		{41798324-16E8-4B59-AF55-822886825731} = {A7874FC8-DB34-4EB0-9EDC-7818B3DF289D}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {CFD385DD-4546-4A43-8AD3-19240ECD18AE}
 	EndGlobalSection
 EndGlobal

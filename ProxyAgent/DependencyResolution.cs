@@ -4,6 +4,7 @@ using System.Reflection;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Microsoft.Azure.IoTSolutions.ReverseProxy.Diagnostics;
+using Microsoft.Azure.IoTSolutions.ReverseProxy.HttpClient;
 using Microsoft.Azure.IoTSolutions.ReverseProxy.Runtime;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -34,6 +35,9 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
         {
             var assembly = Assembly.GetEntryAssembly();
             builder.RegisterAssemblyTypes(assembly).AsImplementedInterfaces();
+
+            var proxyAssembly = typeof(IHttpClient).Assembly;
+            builder.RegisterAssemblyTypes(proxyAssembly).AsImplementedInterfaces();
         }
 
         /// <summary>Setup Custom rules overriding autowired ones.</summary>
