@@ -156,11 +156,10 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.HttpClient
         {
             this.requestContent.Content = new ByteArrayContent(content);
 
-            // When content type is not defined, then assume JSON because that the typical use for this application.
+            // When content type is not defined, then assume JSON because that's the typical use for this application.
             // If the content type is defined, and it's not a file transfer, then set the content type.
             // For file transfers (via multipart), the content type is set in HttpClient.SetHeaders
-            // using TryAddWithoutValidation, to avoid exceptions here (setting multipart content type here
-            // would cause an exception).
+            // using TryAddWithoutValidation. Setting multipart content type here would cause an exception.
             if (mediaType == null)
             {
                 this.ContentType = this.defaultMediaType;
