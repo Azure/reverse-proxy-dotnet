@@ -49,6 +49,8 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.HttpClient
 
     public class HttpRequest : IHttpRequest
     {
+        private const string MULTIPART_REQUEST_CONTENT_TYPE_PREFIX = "multipart/form-data;";
+
         private readonly MediaTypeHeaderValue defaultMediaType = new MediaTypeHeaderValue("application/json");
         private readonly Encoding defaultEncoding = new UTF8Encoding();
 
@@ -153,7 +155,21 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.HttpClient
         public IHttpRequest SetContent(byte[] content, string mediaType)
         {
             this.requestContent.Content = new ByteArrayContent(content);
-            this.ContentType = mediaType == null ? this.defaultMediaType : new MediaTypeHeaderValue(mediaType);
+
+            // When content type is not defined, then assume JSON because that the typical use for this application.
+            // If the content type is defined, and it's not a file transfer, then set the content type.
+            // For file transfers (via multipart), the content type is set in HttpClient.SetHeaders
+            // using TryAddWithoutValidation, to avoid exceptions here (setting multipart content type here
+            // would cause an exception).
+            if (mediaType == null)
+            {
+                this.ContentType = this.defaultMediaType;
+            }
+            else if (!mediaType.StartsWith(MULTIPART_REQUEST_CONTENT_TYPE_PREFIX, StringComparison.InvariantCultureIgnoreCase))
+            {
+                this.ContentType = new MediaTypeHeaderValue(mediaType);
+            }
+
             return this;
         }
     }
