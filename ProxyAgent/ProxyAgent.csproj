@@ -24,6 +24,9 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="2.0.1" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Proxy\Proxy.csproj" />
+  </ItemGroup>
+  <ItemGroup>
     <Content Update="web.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

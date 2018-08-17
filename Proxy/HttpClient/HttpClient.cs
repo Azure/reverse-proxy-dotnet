@@ -81,7 +81,10 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.HttpClient
 
         private async Task<IHttpResponse> SendAsync(IHttpRequest request, HttpMethod httpMethod)
         {
-            var clientHandler = new HttpClientHandler();
+            var clientHandler = new HttpClientHandler
+            {
+                AllowAutoRedirect = this.config.AutoRedirect
+            };
             using (var client = new System.Net.Http.HttpClient(clientHandler))
             {
                 var httpRequest = new HttpRequestMessage
