@@ -32,8 +32,6 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.HttpClient
 
         IHttpRequest SetContent(string content, Encoding encoding, string mediaType);
 
-        IHttpRequest SetContent(string content, Encoding encoding, MediaTypeHeaderValue mediaType);
-
         IHttpRequest SetContent(StringContent stringContent);
 
         IHttpRequest SetContent<T>(T sourceObject);
@@ -49,7 +47,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.HttpClient
 
     public class HttpRequest : IHttpRequest
     {
-        private readonly MediaTypeHeaderValue defaultMediaType = new MediaTypeHeaderValue("application/json");
+        private const string defaultMediaType = "application/json";
         private readonly Encoding defaultEncoding = new UTF8Encoding();
 
         private readonly HttpRequestMessage requestContent = new HttpRequestMessage();
@@ -100,23 +98,17 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.HttpClient
 
         public IHttpRequest SetContent(string content)
         {
-            return this.SetContent(content, this.defaultEncoding, this.defaultMediaType);
+            return this.SetContent(content, this.defaultEncoding, HttpRequest.defaultMediaType);
         }
 
         public IHttpRequest SetContent(string content, Encoding encoding)
         {
-            return this.SetContent(content, encoding, this.defaultMediaType);
+            return this.SetContent(content, encoding, HttpRequest.defaultMediaType);
         }
 
         public IHttpRequest SetContent(string content, Encoding encoding, string mediaType)
         {
-            return this.SetContent(content, encoding, new MediaTypeHeaderValue(mediaType));
-        }
-
-        public IHttpRequest SetContent(string content, Encoding encoding, MediaTypeHeaderValue mediaType)
-        {
-            this.requestContent.Content = new StringContent(content, encoding, mediaType.MediaType);
-            this.ContentType = mediaType;
+            this.requestContent.Headers.Add("ContentType", mediaType == null ? HttpRequest.defaultMediaType : mediaType);
             return this;
         }
 
@@ -129,12 +121,12 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.HttpClient
 
         public IHttpRequest SetContent<T>(T sourceObject)
         {
-            return this.SetContent(sourceObject, this.defaultEncoding, this.defaultMediaType);
+            return this.SetContent(sourceObject, this.defaultEncoding, HttpRequest.defaultMediaType);
         }
 
         public IHttpRequest SetContent<T>(T sourceObject, Encoding encoding)
         {
-            return this.SetContent(sourceObject, encoding, this.defaultMediaType);
+            return this.SetContent(sourceObject, encoding, HttpRequest.defaultMediaType);
         }
 
         public IHttpRequest SetContent<T>(T sourceObject, Encoding encoding, string mediaType)
@@ -153,15 +145,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy.HttpClient
 
         public IHttpRequest SetContent(byte[] content, string mediaType)
         {
-            if (mediaType != null && mediaType.StartsWith("multipart/form-data"))
-            {
-                this.requestContent.Headers.Add("ContentType", mediaType);
-            }
-            else
-            {
-                this.ContentType = mediaType == null ? this.defaultMediaType : new MediaTypeHeaderValue(mediaType);
-            }
-
+            this.requestContent.Headers.Add("ContentType", mediaType == null ? HttpRequest.defaultMediaType : mediaType);
             this.requestContent.Content = new ByteArrayContent(content);
             return this;
         }
