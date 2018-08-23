@@ -266,7 +266,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
                 await responseOut.Body.WriteAsync(response.Content, 0, response.Content.Length);
             }
         }
-        
+
         private byte[] GetRequestPayload(HttpRequest request)
         {
             using (var memstream = new MemoryStream())
