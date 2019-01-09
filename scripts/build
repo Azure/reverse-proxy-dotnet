@@ -23,13 +23,15 @@ run_tests() {
 
     cd $APP_HOME
     header "Running tests..."
-    PROJECTS=$(dotnet sln list | grep 'csproj$' | grep '\.Test')
+    PROJECTS=$(dotnet sln reverse-proxy.sln list | grep '\.Test')
+
     for PROJ in $PROJECTS; do
-        echo "-- $PROJ"
-        dotnet test --configuration $CONFIGURATION $PROJ
+		PROJ=${PROJ//\\/\/}
+		PROJ=$(echo $PROJ | sed 's/[^a-zA-Z\.\/]//g')
+		echo "-- $PROJ"
+		dotnet test --configuration $CONFIGURATION $PROJ_MF
     done
 }
-
 
 # workaround for https://github.com/dotnet/cli/issues/3995
 unset home
