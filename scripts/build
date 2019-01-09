@@ -27,6 +27,7 @@ run_tests() {
 
     for PROJ in $PROJECTS; do
 	PROJ=${PROJ//\\/\/}
+	# Cleaning up special characters
 	PROJ=$(echo $PROJ | sed 's/[^a-zA-Z\.\/]//g')
 	echo "-- $PROJ"
 	dotnet test --configuration $CONFIGURATION $PROJ_MF
