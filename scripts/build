@@ -26,10 +26,10 @@ run_tests() {
     PROJECTS=$(dotnet sln reverse-proxy.sln list | grep '\.Test')
 
     for PROJ in $PROJECTS; do
-		PROJ=${PROJ//\\/\/}
-		PROJ=$(echo $PROJ | sed 's/[^a-zA-Z\.\/]//g')
-		echo "-- $PROJ"
-		dotnet test --configuration $CONFIGURATION $PROJ_MF
+	PROJ=${PROJ//\\/\/}
+	PROJ=$(echo $PROJ | sed 's/[^a-zA-Z\.\/]//g')
+	echo "-- $PROJ"
+	dotnet test --configuration $CONFIGURATION $PROJ_MF
     done
 }
 
