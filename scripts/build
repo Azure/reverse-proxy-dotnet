@@ -11,11 +11,16 @@ compile() {
     check_dependency_dotnet
 
     cd $APP_HOME
-    header "Downloading dependencies..."
-    dotnet restore
+    header "Running tests..."
+    PROJECTS=$(dotnet sln reverse-proxy.sln list | grep '\.Test')
 
-    header "Compiling code..."
-    dotnet build --configuration $CONFIGURATION
+    for PROJ in $PROJECTS; do
+	    PROJ=${PROJ//\\/\/}
+	    # Cleaning up special characters
+    	PROJ=$(echo $PROJ | sed 's/[^a-zA-Z\.\/]//g')
+	    echo "-- $PROJ"
+	    dotnet test --configuration $CONFIGURATION $PROJ
+    done
 }
 
 run_tests() {
