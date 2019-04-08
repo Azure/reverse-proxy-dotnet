@@ -13,6 +13,6 @@ cd $APP_HOME
 dotnet restore --verbosity=quiet
 
 cd ProxyAgent
-dotnet run --configuration $CONFIGURATION --project ProxyAgent.csproj
+dotnet run --configuration $CONFIGURATION --project ProxyAgent/ProxyAgent.csproj
 
 set +e

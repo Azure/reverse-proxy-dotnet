@@ -16,7 +16,7 @@ IF %ERRORLEVEL% NEQ 0 GOTO MISSING_DOTNET
 call dotnet restore
 IF %ERRORLEVEL% NEQ 0 GOTO FAIL
 
-dotnet run --configuration %CONFIGURATION% --project ProxyAgent.csproj
+dotnet run --configuration %CONFIGURATION% --project ProxyAgent\ProxyAgent.csproj
 IF %ERRORLEVEL% NEQ 0 GOTO FAIL
 
 goto :END
