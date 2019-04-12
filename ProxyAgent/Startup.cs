@@ -1,6 +1,5 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
-using System;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Builder;
@@ -9,6 +8,7 @@ using Microsoft.Azure.IoTSolutions.ReverseProxy.Runtime;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using System;
 using ILogger = Microsoft.Azure.IoTSolutions.ReverseProxy.Diagnostics.ILogger;
 
 namespace Microsoft.Azure.IoTSolutions.ReverseProxy
@@ -34,6 +34,11 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
+            services.AddLogging(loggingBuilder =>
+            {
+                loggingBuilder.AddConfiguration(this.Configuration.GetSection("Logging"));
+                loggingBuilder.AddConsole();
+            });
 
             this.ApplicationContainer = DependencyResolution.Setup(services);
 
@@ -51,8 +56,6 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
             ILoggerFactory loggerFactory,
             IApplicationLifetime appLifetime)
         {
-            loggerFactory.AddConsole(this.Configuration.GetSection("Logging"));
-
             // Uncomment these lines if you want to host static files in wwwroot/
             // More info: https://docs.microsoft.com/en-us/aspnet/core/fundamentals/middleware
             // app.UseDefaultFiles();
