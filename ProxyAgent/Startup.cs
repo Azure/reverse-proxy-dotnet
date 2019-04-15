@@ -34,6 +34,7 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
+            // Moving the Logger.AddConsole() from Configure to ConfigureServices by using Services.
             services.AddLogging(loggingBuilder =>
             {
                 loggingBuilder.AddConfiguration(this.Configuration.GetSection("Logging"));
