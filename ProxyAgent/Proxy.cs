@@ -38,7 +38,6 @@ namespace Microsoft.Azure.IoTSolutions.ReverseProxy
                 "connection",
                 "content-length",
                 "keep-alive",
-                "host",
                 "upgrade",
                 "upgrade-insecure-requests"
             };
